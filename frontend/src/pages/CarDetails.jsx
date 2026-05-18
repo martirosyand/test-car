@@ -106,7 +106,7 @@ const CarDetails = () => {
           <div className="action-box">
             <h3>INTÉRESSÉ ?</h3>
             <p>Contactez notre showroom pour réserver un essai.</p>
-            <Link to="/services" className="btn btn-primary btn-block" style={{ marginTop: '1rem' }}>NOUS CONTACTER</Link>
+            <Link to="/contact" className="btn btn-primary btn-block" style={{ marginTop: '1rem' }}>NOUS CONTACTER</Link>
           </div>
         </div>
       </div>

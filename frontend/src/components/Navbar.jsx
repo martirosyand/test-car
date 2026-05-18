@@ -32,7 +32,7 @@ const Navbar = () => {
             <li><Link to="/" onClick={closeMenu} className={location.pathname === '/' ? 'active-link' : ''}>ACCUEIL</Link></li>
             <li><Link to="/inventory" onClick={closeMenu} className={location.pathname === '/inventory' ? 'active-link' : ''}>VÉHICULES</Link></li>
             <li><Link to="/services" onClick={closeMenu} className={location.pathname === '/services' ? 'active-link' : ''}>NOS PRESTATIONS</Link></li>
-            <li><Link to="/services#contact" onClick={closeMenu}>CONTACT</Link></li>
+            <li><Link to="/contact" onClick={closeMenu} className={location.pathname === '/contact' ? 'active-link' : ''}>CONTACT</Link></li>
             <li>
               <Link to="/admin" onClick={closeMenu} className={`admin-link ${location.pathname.startsWith('/admin') ? 'active-link' : ''}`}>
                 <User size={18} /> Navigation privée
