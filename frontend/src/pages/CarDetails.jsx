@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
-import { Engine, Speedometer, GasPump, Calendar } from '@phosphor-icons/react';
+import { Engine, Speedometer, GasPump, Calendar, CaretLeft, CaretRight } from '@phosphor-icons/react';
 import './CarDetails.css';
 const API_URL = import.meta.env.VITE_API_URL;
-
 
 const CarDetails = () => {
   const { id } = useParams();
   const [car, setCar] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeImage, setActiveImage] = useState('');
+  const carouselRef = useRef(null);
 
   useEffect(() => {
     const fetchCar = async () => {
@@ -34,6 +34,41 @@ const CarDetails = () => {
 
   const defaultImg = "https://via.placeholder.com/800x500?text=No+Image+Available";
 
+  const handleScroll = () => {
+    if (carouselRef.current && car && car.images) {
+      const scrollPosition = carouselRef.current.scrollLeft;
+      const slideWidth = carouselRef.current.clientWidth;
+      const index = Math.round(scrollPosition / slideWidth);
+      if (car.images[index] && car.images[index] !== activeImage) {
+        setActiveImage(car.images[index]);
+      }
+    }
+  };
+
+  const scrollToImage = (index) => {
+    if (carouselRef.current && car && car.images) {
+      setActiveImage(car.images[index]);
+      carouselRef.current.scrollTo({
+        left: carouselRef.current.clientWidth * index,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  const scrollPrev = () => {
+    if (car && car.images) {
+      const currentIndex = car.images.indexOf(activeImage);
+      if (currentIndex > 0) scrollToImage(currentIndex - 1);
+    }
+  };
+
+  const scrollNext = () => {
+    if (car && car.images) {
+      const currentIndex = car.images.indexOf(activeImage);
+      if (currentIndex < car.images.length - 1) scrollToImage(currentIndex + 1);
+    }
+  };
+
   return (
     <div className="car-details-page container">
       <Link to="/inventory" className="back-link">&larr; RETOUR AUX VÉHICULES</Link>
@@ -41,9 +76,36 @@ const CarDetails = () => {
       <div className="car-details-layout">
         {/* Left Gallery */}
         <div className="car-gallery">
-          <div className="main-image">
-            <img src={activeImage ? `${API_URL}${activeImage}` : defaultImg} alt={car.title} />
+          {/* Universal Swipeable Carousel with Navigation */}
+          <div className="carousel-container">
+            {car.images && car.images.length > 1 && (
+              <button className="carousel-nav prev" onClick={scrollPrev} disabled={car.images.indexOf(activeImage) === 0}>
+                <CaretLeft weight="bold" />
+              </button>
+            )}
+            
+            <div className="main-image-carousel" ref={carouselRef} onScroll={handleScroll}>
+              {car.images && car.images.length > 0 ? (
+                car.images.map((img, idx) => (
+                  <div className="carousel-slide" key={idx}>
+                    <img src={`${API_URL}${img}`} alt={`${car.brand} ${car.model} - Vue ${idx + 1}`} />
+                  </div>
+                ))
+              ) : (
+                <div className="carousel-slide">
+                  <img src={defaultImg} alt={car.title} />
+                </div>
+              )}
+            </div>
+
+            {car.images && car.images.length > 1 && (
+              <button className="carousel-nav next" onClick={scrollNext} disabled={car.images.indexOf(activeImage) === car.images.length - 1}>
+                <CaretRight weight="bold" />
+              </button>
+            )}
           </div>
+
+          {/* Thumbnails (All Devices) */}
           {car.images && car.images.length > 1 && (
             <div className="thumbnails">
               {car.images.map((img, idx) => (
@@ -52,7 +114,7 @@ const CarDetails = () => {
                   src={`${API_URL}${img}`}
                   alt={`Thumbnail ${idx}`}
                   className={activeImage === img ? 'active' : ''}
-                  onClick={() => setActiveImage(img)}
+                  onClick={() => scrollToImage(idx)}
                 />
               ))}
             </div>

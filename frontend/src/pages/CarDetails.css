@@ -27,6 +27,7 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  min-width: 0; /* Prevents overflow */
 }
 
 .main-image {
@@ -48,6 +49,15 @@
   gap: 1rem;
   overflow-x: auto;
   padding-bottom: 0.5rem;
+  max-width: 100%; /* Prevents overflow */
+  
+  /* Hide scrollbar for a cleaner look */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.thumbnails::-webkit-scrollbar {
+  display: none;
 }
 
 .thumbnails img {
@@ -59,6 +69,7 @@
   border: 2px solid transparent;
   transition: all 0.2s;
   opacity: 0.6;
+  flex-shrink: 0; /* Ensures thumbnails don't shrink and cause layout issues */
 }
 
 .thumbnails img.active, .thumbnails img:hover {
@@ -74,17 +85,21 @@
   border: 1px solid var(--metallic-border);
   border-radius: 12px;
   padding: 2rem;
+  min-width: 0; /* Prevents overflow */
 }
 
 .header-info h1 {
   font-size: 2rem;
   margin: 0.5rem 0;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .header-info .price {
   font-size: 1.8rem;
   color: var(--accent-color);
   font-weight: 700;
+  word-wrap: break-word;
 }
 
 .badge {
@@ -125,6 +140,8 @@
 .spec-item p {
   font-weight: 700;
   font-size: 1.1rem;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .description h3, .action-box h3 {
@@ -136,6 +153,8 @@
 .description p {
   color: var(--text-secondary);
   line-height: 1.8;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .action-box {
@@ -151,8 +170,107 @@
   width: 100%;
 }
 
+/* Unified Carousel Styles */
+.carousel-container {
+  position: relative;
+  width: 100%;
+}
+
+.carousel-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--glass-bg);
+  color: #fff;
+  border: 1px solid var(--metallic-border);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.2s;
+  backdrop-filter: blur(5px);
+}
+
+.carousel-nav:hover:not(:disabled) {
+  background: var(--accent-color);
+  border-color: var(--accent-color);
+}
+
+.carousel-nav:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.carousel-nav.prev {
+  left: 10px;
+}
+
+.carousel-nav.next {
+  right: 10px;
+}
+
+.main-image-carousel {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 12px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--metallic-border);
+  height: 500px;
+  
+  /* Hide scrollbar for a cleaner look */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.main-image-carousel::-webkit-scrollbar {
+  display: none;
+}
+
+.carousel-slide {
+  scroll-snap-align: center;
+  flex: 0 0 100%;
+  height: 100%;
+}
+
+.carousel-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 @media (max-width: 900px) {
   .car-details-layout {
     grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  
+  .main-image-carousel {
+    height: 350px;
+  }
+  
+  .thumbnails img {
+    width: 80px;
+    height: 60px;
+  }
+}
+
+@media (max-width: 600px) {
+  .main-image-carousel {
+    height: 250px;
+  }
+  
+  .specs-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .thumbnails img {
+    width: 70px;
+    height: 50px;
   }
 }

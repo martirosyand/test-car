@@ -10,12 +10,13 @@ const Footer = () => {
         <div className="footer-grid">
           <div className="footer-col">
             <Link to="/" className="logo" style={{ marginBottom: '1.5rem', display: 'inline-flex' }}>
-              <CarProfile weight="fill" className="logo-accent" />
-              GT<span className="logo-accent">AUTO</span>
+              {/* <CarProfile weight="fill" className="logo-accent" />
+              GT<span className="logo-accent">AUTO</span> */}
+              <img src="/public/logo.png" alt="GT Auto" width={150} />
             </Link>
             <p>Des soins premium pour votre voiture. Transparence, excellence et passion automobile pour des résultats impeccables.</p>
           </div>
-          
+
           <div className="footer-col">
             <h4>LIENS RAPIDES</h4>
             <ul className="footer-links">
@@ -44,7 +45,7 @@ const Footer = () => {
             </div>
           </div>
         </div>
-        
+
         <div className="footer-bottom">
           <p>&copy; {new Date().getFullYear()} GT Auto. Tous droits réservés.</p>
         </div>
