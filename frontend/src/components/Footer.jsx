@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { CarProfile, FacebookLogo, InstagramLogo, TwitterLogo, YoutubeLogo } from '@phosphor-icons/react';
+import { FacebookLogo, InstagramLogo, TwitterLogo, YoutubeLogo } from '@phosphor-icons/react';
 import './Footer.css';
 
 const Footer = () => {
@@ -10,9 +10,7 @@ const Footer = () => {
         <div className="footer-grid">
           <div className="footer-col">
             <Link to="/" className="logo" style={{ marginBottom: '1.5rem', display: 'inline-flex' }}>
-              {/* <CarProfile weight="fill" className="logo-accent" />
-              GT<span className="logo-accent">AUTO</span> */}
-              <img src="/public/logo.png" alt="GT Auto" width={150} />
+              <img src="/logo.png" alt="GT Auto" width={150} />
             </Link>
             <p>Des soins premium pour votre voiture. Transparence, excellence et passion automobile pour des résultats impeccables.</p>
           </div>
