@@ -314,9 +314,9 @@ const AdminDashboard = () => {
                   <th>Nom</th>
                   <th>Contact</th>
                   <th>Service</th>
+                  <th>Message</th>
                   <th>Statut</th>
                   <th>Actions</th>
-                  <th>Message</th>
                 </tr>
               </thead>
               <tbody>
