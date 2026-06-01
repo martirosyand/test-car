@@ -316,6 +316,7 @@ const AdminDashboard = () => {
                   <th>Service</th>
                   <th>Statut</th>
                   <th>Actions</th>
+                  <th>Message</th>
                 </tr>
               </thead>
               <tbody>
@@ -325,6 +326,7 @@ const AdminDashboard = () => {
                     <td>{s.name}</td>
                     <td>{s.phone}<br />{s.email}</td>
                     <td>{s.serviceWanted}</td>
+                    <td>{s.message}</td>
                     <td>
                       <span className={`status-badge status-${s.status}`}>{s.status}</span>
                     </td>
