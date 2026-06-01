@@ -40,7 +40,7 @@ const Contact = () => {
               <div className="contact-icon"><PhoneCall weight="fill" /></div>
               <div className="contact-details">
                 <h3>Appelez-nous</h3>
-                <a href="tel:+15551234567">+1 (555) 123-4567</a>
+                <a href="tel:+33668685168">+33 6 68 68 51 68</a>
               </div>
             </div>
 
@@ -48,7 +48,7 @@ const Contact = () => {
               <div className="contact-icon"><EnvelopeSimple weight="fill" /></div>
               <div className="contact-details">
                 <h3>Email</h3>
-                <a href="mailto:service@gtauto.com">service@gtauto.com</a>
+                <a href="mailto:gtauto63@yahoo.com">gtauto63@yahoo.com</a>
               </div>
             </div>
 
@@ -56,7 +56,7 @@ const Contact = () => {
               <div className="contact-icon"><MapPin weight="fill" /></div>
               <div className="contact-details">
                 <h3>Localisation</h3>
-                <p>123 Performance Blvd.<br />Motor City, CA 90210</p>
+                <p>3 BIS ROUTE DU PONT<br />PERIGNAT SUR ALLIER, 63800</p>
               </div>
             </div>
 
@@ -113,7 +113,7 @@ const Contact = () => {
 
         <div className="map-container">
         <iframe
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d105716.29497554972!2d-118.42168393664052!3d34.05389642598384!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80c2c75ddc27da13%3A0xe22fdf6f254608f4!2sLos%20Angeles%2C%20CA!5e0!3m2!1sen!2sus!4v1700000000000!5m2!1sen!2sus"
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d195189.9811612933!2d3.1903511886144424!3d45.82048286045662!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47f6e31e3f50389d%3A0x772d86363b3380ab!2zMyBSdGUgZHUgUG9udCwgNjM4MDAgUMOpcmlnbmF0LXN1ci1BbGxpZXIsINCk0YDQsNC90YbQuNGP!5e0!3m2!1sru!2sam!4v1780341293734!5m2!1sru!2sam"
           width="100%"
           height="100%"
           style={{ border: 0 }}
