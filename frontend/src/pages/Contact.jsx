@@ -113,7 +113,7 @@ const Contact = () => {
 
         <div className="map-container">
         <iframe
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d195189.9811612933!2d3.1903511886144424!3d45.82048286045662!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47f6e31e3f50389d%3A0x772d86363b3380ab!2zMyBSdGUgZHUgUG9udCwgNjM4MDAgUMOpcmlnbmF0LXN1ci1BbGxpZXIsINCk0YDQsNC90YbQuNGP!5e0!3m2!1sru!2sam!4v1780341293734!5m2!1sru!2sam"
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d845.1599620750247!2d3.2247034118518387!3d45.72870555340456!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47f6e31e3f50389d%3A0x772d86363b3380ab!2zMyBSdGUgZHUgUG9udCwgNjM4MDAgUMOpcmlnbmF0LXN1ci1BbGxpZXIsINCk0YDQsNC90YbQuNGP!5e0!3m2!1sru!2sam!4v1780341437158!5m2!1sru!2sam"
           width="100%"
           height="100%"
           style={{ border: 0 }}
