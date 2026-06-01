@@ -26,14 +26,6 @@ const Footer = () => {
           </div>
 
           <div className="footer-col">
-            <h4>LÉGAL</h4>
-            <ul className="footer-links">
-              <li><a href="#">Politique de confidentialité</a></li>
-              <li><a href="#">Conditions d'utilisation</a></li>
-            </ul>
-          </div>
-
-          <div className="footer-col">
             <h4>SUIVEZ-NOUS</h4>
             <div className="social-links">
               <a href="https://www.facebook.com/gtauto63"  target="_blank" rel="noopener noreferrer"><FacebookLogo size={24} /></a>

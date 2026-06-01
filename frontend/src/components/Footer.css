@@ -11,6 +11,10 @@ footer {
   margin-bottom: 3rem;
 }
 
+.footer-col {
+  text-align: center;
+}
+
 .footer-col h4 {
   margin-bottom: 1.5rem;
   font-size: 1.2rem;
@@ -37,6 +41,7 @@ footer {
 
 .social-links {
   display: flex;
+  justify-content: center;
   gap: 1rem;
 }
 
