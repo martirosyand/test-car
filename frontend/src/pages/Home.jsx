@@ -62,7 +62,7 @@ const Home = () => {
             <p style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>Aucun véhicule vedette disponible pour le moment.</p>
           )}
           <div style={{ textAlign: 'center', marginTop: '3rem' }}>
-            <Link to="/inventory" className="btn btn-outline" style={{ borderColor: 'var(--accent-color)', color: 'var(--text-primary)' }}>VOIR L'INVENTAIRE</Link>
+            <Link to="/inventory" className="btn btn-primary">VOIR L'INVENTAIRE</Link>
           </div>
         </div>
       </section>
