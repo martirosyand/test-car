@@ -9,6 +9,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 const Home = () => {
   const [featuredCars, setFeaturedCars] = useState([]);
+  const [discounts, setDiscounts] = useState([]);
 
   useEffect(() => {
     // Fetch latest 3 cars for featured section
@@ -20,7 +21,19 @@ const Home = () => {
         console.error('Error fetching featured cars:', err);
       }
     };
+
+    // Fetch active discounts
+    const fetchDiscounts = async () => {
+      try {
+        const res = await axios.get(`${API_URL}/api/discounts`);
+        setDiscounts(res.data);
+      } catch (err) {
+        console.error('Error fetching discounts:', err);
+      }
+    };
+
     fetchCars();
+    fetchDiscounts();
   }, []);
 
   return (
@@ -53,6 +66,67 @@ const Home = () => {
           </div>
         </div>
       </section>
+
+      {/* Current Discounts Section */}
+      {discounts.length > 0 && (
+        <section id="discounts" className="section" style={{ borderTop: '1px solid var(--metallic-border)', backgroundColor: 'rgba(230, 0, 0, 0.02)' }}>
+          <div className="container">
+            <h2 className="section-title">OFFRES & REMISES</h2>
+            <div className="services-grid">
+              {discounts.map(discount => {
+                const hasValidity = discount.startDate || discount.endDate;
+                return (
+                  <div key={discount._id} className="service-card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '220px', position: 'relative' }}>
+                    <div style={{
+                      position: 'absolute',
+                      top: '1.5rem',
+                      right: '1.5rem',
+                      background: 'var(--accent-color)',
+                      color: '#ffffff',
+                      padding: '0.4rem 0.8rem',
+                      borderRadius: '4px',
+                      fontWeight: '700',
+                      fontSize: '1.1rem',
+                      boxShadow: '0 0 10px rgba(230, 0, 0, 0.4)',
+                      letterSpacing: '0.5px'
+                    }}>
+                      {discount.discountType === 'percentage' ? `-${discount.discountValue}%` : `-${discount.discountValue.toLocaleString('fr-FR')} €`}
+                    </div>
+                    <div>
+                      <h3 style={{ fontSize: '1.3rem', marginRight: '4.5rem', marginBottom: '1rem', color: 'var(--text-primary)' }}>{discount.title}</h3>
+                      <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', marginBottom: '1.5rem', lineHeight: '1.5' }}>{discount.description}</p>
+                    </div>
+                    <div style={{
+                      marginTop: 'auto',
+                      fontSize: '0.85rem',
+                      color: hasValidity ? 'var(--accent-color)' : 'var(--text-secondary)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                      borderTop: '1px solid var(--metallic-border)',
+                      paddingTop: '1rem',
+                      fontWeight: '600'
+                    }}>
+                      <span>🕒</span>
+                      <span>
+                        {discount.startDate && discount.endDate ? (
+                          `Du ${new Date(discount.startDate).toLocaleDateString('fr-FR')} au ${new Date(discount.endDate).toLocaleDateString('fr-FR')}`
+                        ) : discount.startDate ? (
+                          `À partir du ${new Date(discount.startDate).toLocaleDateString('fr-FR')}`
+                        ) : discount.endDate ? (
+                          `Jusqu'au ${new Date(discount.endDate).toLocaleDateString('fr-FR')}`
+                        ) : (
+                          "Offre permanente"
+                        )}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Services Snippet */}
       <section id="services" className="section" style={{ backgroundColor: 'var(--bg-secondary)' }}>
