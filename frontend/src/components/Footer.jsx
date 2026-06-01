@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FacebookLogo, InstagramLogo, TwitterLogo, YoutubeLogo } from '@phosphor-icons/react';
+import { FacebookLogo, InstagramLogo } from '@phosphor-icons/react';
 import './Footer.css';
 
 const Footer = () => {
@@ -36,10 +36,8 @@ const Footer = () => {
           <div className="footer-col">
             <h4>SUIVEZ-NOUS</h4>
             <div className="social-links">
-              <a href="#"><FacebookLogo size={24} /></a>
-              <a href="#"><InstagramLogo size={24} /></a>
-              <a href="#"><TwitterLogo size={24} /></a>
-              <a href="#"><YoutubeLogo size={24} /></a>
+              <a href=""  target="_blank" rel="noopener noreferrer"><FacebookLogo size={24} /></a>
+              <a href="https://www.instagram.com/gtauto63/"  target="_blank" rel="noopener noreferrer"><InstagramLogo size={24} /></a>
             </div>
           </div>
         </div>
