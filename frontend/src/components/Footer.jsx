@@ -36,7 +36,7 @@ const Footer = () => {
           <div className="footer-col">
             <h4>SUIVEZ-NOUS</h4>
             <div className="social-links">
-              <a href=""  target="_blank" rel="noopener noreferrer"><FacebookLogo size={24} /></a>
+              <a href="https://www.facebook.com/gtauto63"  target="_blank" rel="noopener noreferrer"><FacebookLogo size={24} /></a>
               <a href="https://www.instagram.com/gtauto63/"  target="_blank" rel="noopener noreferrer"><InstagramLogo size={24} /></a>
             </div>
           </div>
