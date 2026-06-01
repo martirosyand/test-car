@@ -64,7 +64,7 @@ const Contact = () => {
               <div className="contact-icon"><Clock weight="fill" /></div>
               <div className="contact-details">
                 <h3>Horaires d'ouverture</h3>
-                <p>Lun - Ven: 8:00 - 18:00<br />Sam: 9:00 - 14:00<br />Dim: Fermé</p>
+                <p>Lun - Ven: 9:00 - 18:30<br />Sam: 10:00 - 16:00<br />Dim: Fermé</p>
               </div>
             </div>
           </div>
@@ -93,9 +93,9 @@ const Contact = () => {
                 <label>Service souhaité</label>
                 <select name="serviceWanted" value={formData.serviceWanted} onChange={handleChange} className="form-control" required>
                   <option value="" disabled>Sélectionnez un service</option>
-                  <option value="Oil Change">Révision et vidange</option>
+                  <option value="Oil Change">Révision</option>
                   <option value="Diagnostics">Diagnostic</option>
-                  <option value="Brakes">Freinage</option>
+                  <option value="Repair">Réparation</option>
                   <option value="Purchase Inquiry">Demande d'achat de véhicule</option>
                   <option value="Other">Autre</option>
                 </select>
