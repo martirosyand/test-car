@@ -33,25 +33,17 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
 
   const fetchDashboardData = async () => {
-    const token = localStorage.getItem('adminToken');
-    if (!token) {
-      navigate('/admin');
-      return;
-    }
-
     try {
-      const config = { headers: { Authorization: `Bearer ${token}` } };
       const [carsRes, servicesRes, discountsRes] = await Promise.all([
         axios.get(`${API_URL}/api/cars`),
-        axios.get(`${API_URL}/api/services`, config),
-        axios.get(`${API_URL}/api/discounts/all`, config)
+        axios.get(`${API_URL}/api/services`),
+        axios.get(`${API_URL}/api/discounts/all`)
       ]);
       setCars(carsRes.data);
       setServices(servicesRes.data);
       setDiscounts(discountsRes.data);
     } catch (err) {
       if (err.response?.status === 401) {
-        localStorage.removeItem('adminToken');
         navigate('/admin');
       }
       console.error(err);
@@ -64,8 +56,12 @@ const AdminDashboard = () => {
     fetchDashboardData();
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem('adminToken');
+  const handleLogout = async () => {
+    try {
+      await axios.post(`${API_URL}/api/admin/logout`);
+    } catch (err) {
+      console.error("Logout request failed:", err);
+    }
     navigate('/admin');
   };
 
@@ -73,7 +69,6 @@ const AdminDashboard = () => {
 
   const handleAddCar = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem('adminToken');
     const formData = new FormData();
     for (let key in carForm) formData.append(key, carForm[key]);
     if (images) {
@@ -84,7 +79,7 @@ const AdminDashboard = () => {
 
     try {
       await axios.post(`${API_URL}/api/cars`, formData, {
-        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' }
+        headers: { 'Content-Type': 'multipart/form-data' }
       });
       // clear form
       setCarForm({ title: '', brand: '', model: '', year: '', price: '', mileage: '', engine: '', transmission: '', description: '' });
@@ -99,11 +94,8 @@ const AdminDashboard = () => {
 
   const handleDeleteCar = async (id) => {
     if (!window.confirm('Supprimer ce véhicule ?')) return;
-    const token = localStorage.getItem('adminToken');
     try {
-      await axios.delete(`${API_URL}/api/cars/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await axios.delete(`${API_URL}/api/cars/${id}`);
       fetchDashboardData();
     } catch (err) {
       console.error(err);
@@ -111,11 +103,8 @@ const AdminDashboard = () => {
   };
 
   const updateServiceStatus = async (id, status) => {
-    const token = localStorage.getItem('adminToken');
     try {
-      await axios.put(`${API_URL}/api/services/${id}`, { status }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await axios.put(`${API_URL}/api/services/${id}`, { status });
       fetchDashboardData();
     } catch (err) {
       console.error(err);
@@ -134,8 +123,6 @@ const AdminDashboard = () => {
 
   const handleAddOrUpdateDiscount = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem('adminToken');
-    const config = { headers: { Authorization: `Bearer ${token}` } };
 
     const payload = {
       ...discountForm,
@@ -146,10 +133,10 @@ const AdminDashboard = () => {
 
     try {
       if (editingDiscountId) {
-        await axios.put(`${API_URL}/api/discounts/${editingDiscountId}`, payload, config);
+        await axios.put(`${API_URL}/api/discounts/${editingDiscountId}`, payload);
         alert('Remise modifiée avec succès');
       } else {
-        await axios.post(`${API_URL}/api/discounts`, payload, config);
+        await axios.post(`${API_URL}/api/discounts`, payload);
         alert('Remise ajoutée avec succès');
       }
       
@@ -197,10 +184,8 @@ const AdminDashboard = () => {
 
   const handleDeleteDiscount = async (id) => {
     if (!window.confirm('Supprimer cette remise ?')) return;
-    const token = localStorage.getItem('adminToken');
-    const config = { headers: { Authorization: `Bearer ${token}` } };
     try {
-      await axios.delete(`${API_URL}/api/discounts/${id}`, config);
+      await axios.delete(`${API_URL}/api/discounts/${id}`);
       fetchDashboardData();
     } catch (err) {
       console.error(err);

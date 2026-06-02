@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './Admin.css';
@@ -8,20 +8,36 @@ const API_URL = import.meta.env.VITE_API_URL;
 const AdminLogin = () => {
   const [credentials, setCredentials] = useState({ username: '', password: '' });
   const [error, setError] = useState('');
+  const [checkingAuth, setCheckingAuth] = useState(true);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        await axios.get(`${API_URL}/api/admin/verify`);
+        navigate('/admin/dashboard');
+      } catch (err) {
+        setCheckingAuth(false);
+      }
+    };
+    checkAuth();
+  }, [navigate]);
 
   const handleChange = e => setCredentials({ ...credentials, [e.target.name]: e.target.value });
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post(`${API_URL}/api/admin/login`, credentials);
-      localStorage.setItem('adminToken', res.data.token);
+      await axios.post(`${API_URL}/api/admin/login`, credentials);
       navigate('/admin/dashboard');
     } catch (err) {
       setError(err.response?.data?.message || 'Échec de la connexion');
     }
   };
+
+  if (checkingAuth) {
+    return <div className="container" style={{ paddingTop: '150px' }}><p>Chargement...</p></div>;
+  }
 
   return (
     <div className="admin-page">
