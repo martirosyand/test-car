@@ -1,0 +1,276 @@
+.car-details-page {
+  padding-top: 120px;
+  padding-bottom: 4rem;
+  min-height: 100vh;
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 2rem;
+  color: var(--accent-color);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.back-link:hover {
+  color: #fff;
+}
+
+.car-details-layout {
+  display: grid;
+  grid-template-columns: 1fr 450px;
+  gap: 4rem;
+}
+
+.car-gallery {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 0; /* Prevents overflow */
+}
+
+.main-image {
+  background: var(--bg-secondary);
+  border: 1px solid var(--metallic-border);
+  border-radius: 12px;
+  overflow: hidden;
+  height: 500px;
+}
+
+.main-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.thumbnails {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  max-width: 100%; /* Prevents overflow */
+  
+  /* Hide scrollbar for a cleaner look */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.thumbnails::-webkit-scrollbar {
+  display: none;
+}
+
+.thumbnails img {
+  width: 120px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.2s;
+  opacity: 0.6;
+  flex-shrink: 0; /* Ensures thumbnails don't shrink and cause layout issues */
+}
+
+.thumbnails img.active, .thumbnails img:hover {
+  border-color: var(--accent-color);
+  opacity: 1;
+}
+
+.car-info-full {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--metallic-border);
+  border-radius: 12px;
+  padding: 2rem;
+  min-width: 0; /* Prevents overflow */
+}
+
+.header-info h1 {
+  font-size: 2rem;
+  margin: 0.5rem 0;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.header-info .price {
+  font-size: 1.8rem;
+  color: var(--accent-color);
+  font-weight: 700;
+  word-wrap: break-word;
+}
+
+.badge {
+  background: var(--bg-secondary);
+  border: 1px solid var(--metallic-border);
+  padding: 0.3rem 0.8rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.specs-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  border-top: 1px solid var(--metallic-border);
+  border-bottom: 1px solid var(--metallic-border);
+  padding: 1.5rem 0;
+}
+
+.spec-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.spec-item svg.spec-icon {
+  font-size: 1.8rem;
+  color: var(--accent-color);
+}
+
+.spec-item small {
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  font-size: 0.8rem;
+}
+
+.spec-item p {
+  font-weight: 700;
+  font-size: 1.1rem;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.description h3, .action-box h3 {
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  font-size: 1rem;
+}
+
+.description p {
+  color: var(--text-secondary);
+  line-height: 1.8;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.action-box {
+  background: var(--bg-secondary);
+  border: 1px solid var(--metallic-border);
+  padding: 2rem;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.btn-block {
+  display: block;
+  width: 100%;
+}
+
+/* Unified Carousel Styles */
+.carousel-container {
+  position: relative;
+  width: 100%;
+}
+
+.carousel-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--glass-bg);
+  color: #fff;
+  border: 1px solid var(--metallic-border);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.2s;
+  backdrop-filter: blur(5px);
+}
+
+.carousel-nav:hover:not(:disabled) {
+  background: var(--accent-color);
+  border-color: var(--accent-color);
+}
+
+.carousel-nav:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.carousel-nav.prev {
+  left: 10px;
+}
+
+.carousel-nav.next {
+  right: 10px;
+}
+
+.main-image-carousel {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 12px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--metallic-border);
+  height: 500px;
+  
+  /* Hide scrollbar for a cleaner look */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.main-image-carousel::-webkit-scrollbar {
+  display: none;
+}
+
+.carousel-slide {
+  scroll-snap-align: center;
+  flex: 0 0 100%;
+  height: 100%;
+}
+
+.carousel-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@media (max-width: 900px) {
+  .car-details-layout {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  
+  .main-image-carousel {
+    height: 350px;
+  }
+  
+  .thumbnails img {
+    width: 80px;
+    height: 60px;
+  }
+}
+
+@media (max-width: 600px) {
+  .main-image-carousel {
+    height: 250px;
+  }
+  
+  .specs-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .thumbnails img {
+    width: 70px;
+    height: 50px;
+  }
+}

@@ -20,7 +20,7 @@ async function getCar(id) {
 }
 
 export async function generateMetadata({ params }) {
-  const { id } = params;
+  const { id } = await params;
   const car = await getCar(id);
 
   if (!car) {
@@ -63,7 +63,7 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function CarDetailsPage({ params }) {
-  const { id } = params;
+  const { id } = await params;
   const car = await getCar(id);
 
   if (!car) {
