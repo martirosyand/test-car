@@ -44,12 +44,12 @@ export async function generateMetadata({ params }) {
     title,
     description,
     alternates: {
-      canonical: `/inventory/${id}`,
+      canonical: `${siteUrl}/inventory/${id}`,
     },
     openGraph: {
       title,
       description,
-      url: `/inventory/${id}`,
+      url: `${siteUrl}/inventory/${id}`,
       images: imageUrl ? [{ url: imageUrl }] : [],
       type: 'website',
     },
