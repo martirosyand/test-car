@@ -16,20 +16,27 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // CORS configuration to support cookies/credentials from frontend
-const allowedOrigins = [
-  process.env.FRONTEND_URL,
-  'http://localhost:5173',
-  'http://127.0.0.1:5173'
-].filter(Boolean);
+const isAllowedOrigin = (origin) => {
+  if (!origin) return true;
+  // Allow all origins in development/test environments (e.g. VPS, containerized testing)
+  if (process.env.NODE_ENV !== 'production') {
+    return true;
+  }
+  const allowedOrigins = [
+    process.env.FRONTEND_URL,
+    'http://localhost:5173',
+    'http://127.0.0.1:5173'
+  ].filter(Boolean);
+  return allowedOrigins.includes(origin);
+};
 
 app.use(cors({
   origin: function (origin, callback) {
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) === -1) {
-      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
-      return callback(new Error(msg), false);
+    if (isAllowedOrigin(origin)) {
+      return callback(null, true);
     }
-    return callback(null, true);
+    const msg = `The CORS policy for this site does not allow access from the specified Origin: ${origin}`;
+    return callback(new Error(msg), false);
   },
   credentials: true
 }));
