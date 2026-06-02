@@ -1,50 +1,95 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import axios from 'axios';
-import CarCard from '../components/CarCard';
-import './Home.css';
-import { Drop, Engine, SteeringWheel, CarProfile } from '@phosphor-icons/react';
-const API_URL = import.meta.env.VITE_API_URL;
+import React from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import CarCard from '@/components/CarCard';
+import { Drop, Engine, SteeringWheel } from '@phosphor-icons/react/dist/ssr';
 
+// Configure backend URL for SSR data fetching
+const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:5000';
 
-const Home = () => {
-  const [featuredCars, setFeaturedCars] = useState([]);
-  const [discounts, setDiscounts] = useState([]);
+async function getFeaturedCars() {
+  try {
+    const res = await fetch(`${BACKEND_URL}/api/cars`, { next: { revalidate: 60 } });
+    if (!res.ok) return [];
+    const cars = await res.json();
+    return cars.slice(0, 3);
+  } catch (err) {
+    console.error('Error fetching featured cars:', err);
+    return [];
+  }
+}
 
-  useEffect(() => {
-    // Fetch latest 3 cars for featured section
-    const fetchCars = async () => {
-      try {
-        const res = await axios.get(`${API_URL}/api/cars`);
-        setFeaturedCars(res.data.slice(0, 3));
-      } catch (err) {
-        console.error('Error fetching featured cars:', err);
-      }
-    };
+async function getDiscounts() {
+  try {
+    const res = await fetch(`${BACKEND_URL}/api/discounts`, { next: { revalidate: 60 } });
+    if (!res.ok) return [];
+    return await res.json();
+  } catch (err) {
+    console.error('Error fetching discounts:', err);
+    return [];
+  }
+}
 
-    // Fetch active discounts
-    const fetchDiscounts = async () => {
-      try {
-        const res = await axios.get(`${API_URL}/api/discounts`);
-        setDiscounts(res.data);
-      } catch (err) {
-        console.error('Error fetching discounts:', err);
-      }
-    };
+export const metadata = {
+  title: "GT Auto | Vente et Entretien de Véhicules Premium",
+  description: "Découvrez notre sélection de véhicules d'occasion révisés et garantis, ainsi que nos prestations d'entretien mécanique et diagnostic de pointe.",
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    title: "GT Auto | Vente et Entretien de Véhicules Premium",
+    description: "Découvrez notre sélection de véhicules d'occasion révisés et garantis, ainsi que nos prestations d'entretien mécanique et diagnostic de pointe.",
+    url: '/',
+  },
+};
 
-    fetchCars();
-    fetchDiscounts();
-  }, []);
+export default async function Home() {
+  const [featuredCars, discounts] = await Promise.all([
+    getFeaturedCars(),
+    getDiscounts()
+  ]);
+
+  // Schema.org structured data for local business / garage
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'AutoRepair',
+    'name': 'GT Auto',
+    'image': 'http://localhost:3000/logo.png',
+    'address': {
+      '@type': 'PostalAddress',
+      'streetAddress': '123 Performance Blvd.',
+      'addressLocality': 'Motor City',
+      'addressRegion': 'CA',
+      'postalCode': '90210',
+      'addressCountry': 'US'
+    },
+    'telephone': '+1 (555) 123-4567',
+    'openingHours': 'Mo-Fr 08:00-18:00, Sa 09:00-14:00',
+    'priceRange': '$$'
+  };
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+
       <section id="home" className="hero-split">
         <div className="hero-left-panel container">
           <img src="/logo.png" alt="Garage GT Auto Logo" className="hero-logo-img" />
           <h2 className="hero-subheadline">GARAGE DE CONFIANCE POUR L'ENTRETIEN, LA RÉPARATION ET LA VENTE AUTOMOBILE</h2>
         </div>
         <div className="hero-right-panel">
-          <img src="/hero-bg.jpg" alt="Premium Garage Car" className="hero-car-image" />
+          <Image 
+            src="/hero-bg.jpg" 
+            alt="Premium Garage Car" 
+            className="hero-car-image" 
+            fill
+            sizes="50vw"
+            style={{ objectFit: 'cover' }}
+            priority
+          />
         </div>
       </section>
 
@@ -62,7 +107,7 @@ const Home = () => {
             <p style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>Aucun véhicule vedette disponible pour le moment.</p>
           )}
           <div style={{ textAlign: 'center', marginTop: '3rem' }}>
-            <Link to="/inventory" className="btn btn-primary">VOIR L'INVENTAIRE</Link>
+            <Link href="/inventory" className="btn btn-primary">VOIR L'INVENTAIRE</Link>
           </div>
         </div>
       </section>
@@ -133,7 +178,6 @@ const Home = () => {
         <div className="container">
           <h2 className="section-title">NOS SERVICES POPULAIRES</h2>
           <div className="services-grid">
-
             <div className="service-card">
               <Drop weight="fill" className="service-icon" />
               <h3>Révision et vidange</h3>
@@ -151,15 +195,12 @@ const Home = () => {
               <h3>Pneumatiques</h3>
               <p>Rotation, équilibrage, alignement et remplacement.</p>
             </div>
-
           </div>
           <div style={{ textAlign: 'center', marginTop: '3rem' }}>
-            <Link to="/services" className="btn btn-primary">VOIR TOUTES NOS PRESTATIONS</Link>
+            <Link href="/services" className="btn btn-primary">VOIR TOUTES NOS PRESTATIONS</Link>
           </div>
         </div>
       </section>
     </>
   );
-};
-
-export default Home;
+}

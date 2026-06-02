@@ -1,7 +1,6 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { FacebookLogo, InstagramLogo } from '@phosphor-icons/react';
-import './Footer.css';
+import Link from 'next/link';
+import { FacebookLogo, InstagramLogo } from '@phosphor-icons/react/dist/ssr';
 
 const Footer = () => {
   return (
@@ -9,7 +8,7 @@ const Footer = () => {
       <div className="container">
         <div className="footer-grid">
           <div className="footer-col">
-            <Link to="/" className="logo" style={{ marginBottom: '1.5rem', display: 'inline-flex' }}>
+            <Link href="/" className="logo" style={{ marginBottom: '1.5rem', display: 'inline-flex' }}>
               <img src="/logo.png" alt="GT Auto" width={150} />
             </Link>
             <p>Des soins premium pour votre voiture. Transparence, excellence et passion automobile pour des résultats impeccables.</p>
@@ -18,10 +17,10 @@ const Footer = () => {
           <div className="footer-col">
             <h4>LIENS RAPIDES</h4>
             <ul className="footer-links">
-              <li><Link to="/">Accueil</Link></li>
-              <li><Link to="/inventory">Véhicules</Link></li>
-              <li><Link to="/services">Nos prestations</Link></li>
-              <li><Link to="/services#contact">Contact</Link></li>
+              <li><Link href="/">Accueil</Link></li>
+              <li><Link href="/inventory">Véhicules</Link></li>
+              <li><Link href="/services">Nos prestations</Link></li>
+              <li><Link href="/contact">Contact</Link></li>
             </ul>
           </div>
 

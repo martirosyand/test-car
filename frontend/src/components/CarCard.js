@@ -1,19 +1,29 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { Engine, Speedometer, GasPump } from '@phosphor-icons/react';
-import './CarCard.css';
-const API_URL = import.meta.env.VITE_API_URL
+import Link from 'next/link';
+import Image from 'next/image';
+import { Engine, Speedometer, GasPump } from '@phosphor-icons/react/dist/ssr';
 
 const CarCard = ({ car }) => {
   const defaultImage = "https://via.placeholder.com/400x250?text=No+Image";
   const imageSrc = car.images && car.images.length > 0
-    ? `${API_URL}${car.images[0]}`
+    ? car.images[0]
     : defaultImage;
 
   return (
-    <Link to={`/inventory/${car._id}`} className="car-card">
+    <Link href={`/inventory/${car._id}`} className="car-card">
       <div className="car-image">
-        <img src={imageSrc} alt={`${car.year} ${car.brand} ${car.model}`} />
+        {imageSrc.startsWith('http') ? (
+          <img src={imageSrc} alt={`${car.year} ${car.brand} ${car.model}`} />
+        ) : (
+          <Image 
+            src={imageSrc} 
+            alt={`${car.year} ${car.brand} ${car.model}`}
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            style={{ objectFit: 'cover' }}
+            priority={false}
+          />
+        )}
         <div className="car-badge">{car.year}</div>
         <div className="car-price">{car.price.toLocaleString('fr-FR')} €</div>
       </div>

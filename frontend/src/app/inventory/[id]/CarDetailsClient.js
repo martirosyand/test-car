@@ -1,36 +1,14 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import axios from 'axios';
+'use client';
+
+import React, { useState, useRef } from 'react';
+import Link from 'next/link';
 import { Engine, Speedometer, GasPump, Calendar, CaretLeft, CaretRight } from '@phosphor-icons/react';
-import './CarDetails.css';
-const API_URL = import.meta.env.VITE_API_URL;
 
-const CarDetails = () => {
-  const { id } = useParams();
-  const [car, setCar] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [activeImage, setActiveImage] = useState('');
+const CarDetailsClient = ({ car }) => {
+  const [activeImage, setActiveImage] = useState(
+    car.images && car.images.length > 0 ? car.images[0] : ''
+  );
   const carouselRef = useRef(null);
-
-  useEffect(() => {
-    const fetchCar = async () => {
-      try {
-        const res = await axios.get(`${API_URL}/api/cars/${id}`);
-        setCar(res.data);
-        if (res.data.images && res.data.images.length > 0) {
-          setActiveImage(res.data.images[0]);
-        }
-      } catch (err) {
-        console.error('Failed to load car details', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchCar();
-  }, [id]);
-
-  if (loading) return <div className="container" style={{ paddingTop: '150px' }}><p>Chargement...</p></div>;
-  if (!car) return <div className="container" style={{ paddingTop: '150px' }}><p>Véhicule introuvable.</p></div>;
 
   const defaultImg = "https://via.placeholder.com/800x500?text=No+Image+Available";
 
@@ -70,8 +48,8 @@ const CarDetails = () => {
   };
 
   return (
-    <div className="car-details-page container">
-      <Link to="/inventory" className="back-link">&larr; RETOUR AUX VÉHICULES</Link>
+    <div className="car-details-page container" style={{ paddingTop: '120px', paddingBottom: '4rem' }}>
+      <Link href="/inventory" className="back-link">&larr; RETOUR AUX VÉHICULES</Link>
 
       <div className="car-details-layout">
         {/* Left Gallery */}
@@ -88,7 +66,7 @@ const CarDetails = () => {
               {car.images && car.images.length > 0 ? (
                 car.images.map((img, idx) => (
                   <div className="carousel-slide" key={idx}>
-                    <img src={`${API_URL}${img}`} alt={`${car.brand} ${car.model} - Vue ${idx + 1}`} />
+                    <img src={img} alt={`${car.brand} ${car.model} - Vue ${idx + 1}`} />
                   </div>
                 ))
               ) : (
@@ -111,7 +89,7 @@ const CarDetails = () => {
               {car.images.map((img, idx) => (
                 <img
                   key={idx}
-                  src={`${API_URL}${img}`}
+                  src={img}
                   alt={`Thumbnail ${idx}`}
                   className={activeImage === img ? 'active' : ''}
                   onClick={() => scrollToImage(idx)}
@@ -168,7 +146,7 @@ const CarDetails = () => {
           <div className="action-box">
             <h3>INTÉRESSÉ ?</h3>
             <p>Contactez notre showroom pour réserver un essai.</p>
-            <Link to="/contact" className="btn btn-primary btn-block" style={{ marginTop: '1rem' }}>NOUS CONTACTER</Link>
+            <Link href="/contact" className="btn btn-primary btn-block" style={{ marginTop: '1rem', display: 'block' }}>NOUS CONTACTER</Link>
           </div>
         </div>
       </div>
@@ -176,4 +154,4 @@ const CarDetails = () => {
   );
 };
 
-export default CarDetails;
+export default CarDetailsClient;

@@ -1,11 +1,13 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import axios from 'axios';
-import './Admin.css';
-const API_URL = import.meta.env.VITE_API_URL;
 
+// Ensure cookie-based sessions work by enabling credentials on all requests
+axios.defaults.withCredentials = true;
 
-const AdminDashboard = () => {
+export default function AdminDashboardClient() {
   const [cars, setCars] = useState([]);
   const [services, setServices] = useState([]);
   const [discounts, setDiscounts] = useState([]);
@@ -30,23 +32,23 @@ const AdminDashboard = () => {
   });
   const [editingDiscountId, setEditingDiscountId] = useState(null);
 
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const fetchDashboardData = async () => {
     try {
       const [carsRes, servicesRes, discountsRes] = await Promise.all([
-        axios.get(`${API_URL}/api/cars`),
-        axios.get(`${API_URL}/api/services`),
-        axios.get(`${API_URL}/api/discounts/all`)
+        axios.get('/api/cars'),
+        axios.get('/api/services'),
+        axios.get('/api/discounts/all')
       ]);
       setCars(carsRes.data);
       setServices(servicesRes.data);
       setDiscounts(discountsRes.data);
     } catch (err) {
       if (err.response?.status === 401) {
-        navigate('/admin');
+        router.push('/admin');
       }
-      console.error(err);
+      console.error('Error fetching dashboard data:', err);
     } finally {
       setLoading(false);
     }
@@ -58,11 +60,11 @@ const AdminDashboard = () => {
 
   const handleLogout = async () => {
     try {
-      await axios.post(`${API_URL}/api/admin/logout`);
+      await axios.post('/api/admin/logout');
     } catch (err) {
       console.error("Logout request failed:", err);
     }
-    navigate('/admin');
+    router.push('/admin');
   };
 
   const handleCarInput = (e) => setCarForm({ ...carForm, [e.target.name]: e.target.value });
@@ -78,14 +80,16 @@ const AdminDashboard = () => {
     }
 
     try {
-      await axios.post(`${API_URL}/api/cars`, formData, {
+      await axios.post('/api/cars', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       // clear form
       setCarForm({ title: '', brand: '', model: '', year: '', price: '', mileage: '', engine: '', transmission: '', description: '' });
       setImages(null);
-      document.getElementById('image-input').value = "";
+      const fileInput = document.getElementById('image-input');
+      if (fileInput) fileInput.value = "";
       fetchDashboardData();
+      alert('Véhicule ajouté avec succès');
     } catch (err) {
       console.error(err);
       alert('Échec de l\'ajout du véhicule');
@@ -95,21 +99,23 @@ const AdminDashboard = () => {
   const handleDeleteCar = async (id) => {
     if (!window.confirm('Supprimer ce véhicule ?')) return;
     try {
-      await axios.delete(`${API_URL}/api/cars/${id}`);
+      await axios.delete(`/api/cars/${id}`);
       fetchDashboardData();
     } catch (err) {
       console.error(err);
+      alert('Échec de la suppression du véhicule');
     }
   };
 
   const updateServiceStatus = async (id, status) => {
     try {
-      await axios.put(`${API_URL}/api/services/${id}`, { status });
+      await axios.put(`/api/services/${id}`, { status });
       fetchDashboardData();
     } catch (err) {
       console.error(err);
+      alert('Échec de la modification du statut');
     }
-  }
+  };
 
   const handleDiscountInput = (e) => {
     const { name, value } = e.target;
@@ -133,10 +139,10 @@ const AdminDashboard = () => {
 
     try {
       if (editingDiscountId) {
-        await axios.put(`${API_URL}/api/discounts/${editingDiscountId}`, payload);
+        await axios.put(`/api/discounts/${editingDiscountId}`, payload);
         alert('Remise modifiée avec succès');
       } else {
-        await axios.post(`${API_URL}/api/discounts`, payload);
+        await axios.post('/api/discounts', payload);
         alert('Remise ajoutée avec succès');
       }
       
@@ -185,7 +191,7 @@ const AdminDashboard = () => {
   const handleDeleteDiscount = async (id) => {
     if (!window.confirm('Supprimer cette remise ?')) return;
     try {
-      await axios.delete(`${API_URL}/api/discounts/${id}`);
+      await axios.delete(`/api/discounts/${id}`);
       fetchDashboardData();
     } catch (err) {
       console.error(err);
@@ -193,7 +199,13 @@ const AdminDashboard = () => {
     }
   };
 
-  if (loading) return <div className="container" style={{ paddingTop: '150px' }}><p>Chargement...</p></div>;
+  if (loading) {
+    return (
+      <div className="container" style={{ paddingTop: '150px', paddingBottom: '4rem' }}>
+        <p style={{ color: 'var(--text-secondary)' }}>Chargement...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="admin-dashboard container" style={{ paddingTop: '120px', paddingBottom: '4rem' }}>
@@ -214,43 +226,43 @@ const AdminDashboard = () => {
           <form className="contact-form add-car-form" onSubmit={handleAddCar}>
             <div className="grid-form">
               <div className="form-group">
-                <label>Titre</label>
-                <input type="text" name="title" value={carForm.title} onChange={handleCarInput} className="form-control" required />
+                <label htmlFor="car-title">Titre</label>
+                <input type="text" id="car-title" name="title" value={carForm.title} onChange={handleCarInput} className="form-control" required />
               </div>
               <div className="form-group">
-                <label>Marque</label>
-                <input type="text" name="brand" value={carForm.brand} onChange={handleCarInput} className="form-control" required />
+                <label htmlFor="car-brand">Marque</label>
+                <input type="text" id="car-brand" name="brand" value={carForm.brand} onChange={handleCarInput} className="form-control" required />
               </div>
               <div className="form-group">
-                <label>Modèle</label>
-                <input type="text" name="model" value={carForm.model} onChange={handleCarInput} className="form-control" required />
+                <label htmlFor="car-model">Modèle</label>
+                <input type="text" id="car-model" name="model" value={carForm.model} onChange={handleCarInput} className="form-control" required />
               </div>
               <div className="form-group">
-                <label>Année</label>
-                <input type="number" name="year" value={carForm.year} onChange={handleCarInput} className="form-control" required />
+                <label htmlFor="car-year">Année</label>
+                <input type="number" id="car-year" name="year" value={carForm.year} onChange={handleCarInput} className="form-control" required />
               </div>
               <div className="form-group">
-                <label>Prix</label>
-                <input type="number" name="price" value={carForm.price} onChange={handleCarInput} className="form-control" required />
+                <label htmlFor="car-price">Prix (€)</label>
+                <input type="number" id="car-price" name="price" value={carForm.price} onChange={handleCarInput} className="form-control" required />
               </div>
               <div className="form-group">
-                <label>Kilométrage</label>
-                <input type="number" name="mileage" value={carForm.mileage} onChange={handleCarInput} className="form-control" required />
+                <label htmlFor="car-mileage">Kilométrage (km)</label>
+                <input type="number" id="car-mileage" name="mileage" value={carForm.mileage} onChange={handleCarInput} className="form-control" required />
               </div>
               <div className="form-group">
-                <label>Moteur</label>
-                <input type="text" name="engine" value={carForm.engine} onChange={handleCarInput} className="form-control" required />
+                <label htmlFor="car-engine">Moteur</label>
+                <input type="text" id="car-engine" name="engine" value={carForm.engine} onChange={handleCarInput} className="form-control" required />
               </div>
               <div className="form-group">
-                <label>Transmission</label>
-                <input type="text" name="transmission" value={carForm.transmission} onChange={handleCarInput} className="form-control" required />
+                <label htmlFor="car-transmission">Transmission</label>
+                <input type="text" id="car-transmission" name="transmission" value={carForm.transmission} onChange={handleCarInput} className="form-control" required />
               </div>
               <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-                <label>Description</label>
-                <textarea name="description" value={carForm.description} onChange={handleCarInput} className="form-control"></textarea>
+                <label htmlFor="car-description">Description</label>
+                <textarea id="car-description" name="description" value={carForm.description} onChange={handleCarInput} className="form-control" rows="4"></textarea>
               </div>
               <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-                <label>Images (Sélection multiple)</label>
+                <label htmlFor="image-input">Images (Sélection multiple)</label>
                 <input id="image-input" type="file" multiple accept="image/*" onChange={(e) => setImages(e.target.files)} className="form-control" style={{ padding: '0.8rem' }} />
               </div>
             </div>
@@ -321,7 +333,7 @@ const AdminDashboard = () => {
                     </td>
                   </tr>
                 ))}
-                {services.length === 0 && <tr><td colSpan="6" style={{ textAlign: 'center' }}>Aucune demande de service.</td></tr>}
+                {services.length === 0 && <tr><td colSpan="7" style={{ textAlign: 'center' }}>Aucune demande de service.</td></tr>}
               </tbody>
             </table>
           </div>
@@ -334,16 +346,16 @@ const AdminDashboard = () => {
           <form className="contact-form add-car-form" onSubmit={handleAddOrUpdateDiscount}>
             <div className="grid-form">
               <div className="form-group">
-                <label>Titre de l'offre</label>
-                <input type="text" name="title" value={discountForm.title} onChange={handleDiscountInput} className="form-control" placeholder="Ex: Offre de Printemps" required />
+                <label htmlFor="discount-title">Titre de l'offre</label>
+                <input type="text" id="discount-title" name="title" value={discountForm.title} onChange={handleDiscountInput} className="form-control" placeholder="Ex: Offre de Printemps" required />
               </div>
               <div className="form-group">
-                <label>Valeur de la remise</label>
-                <input type="number" name="discountValue" value={discountForm.discountValue} onChange={handleDiscountInput} className="form-control" placeholder="Ex: 15 ou 1500" required />
+                <label htmlFor="discount-value">Valeur de la remise</label>
+                <input type="number" id="discount-value" name="discountValue" value={discountForm.discountValue} onChange={handleDiscountInput} className="form-control" placeholder="Ex: 15 ou 1500" required />
               </div>
               <div className="form-group">
-                <label>Type de remise</label>
-                <select name="discountType" value={discountForm.discountType} onChange={handleDiscountInput} className="form-control" required style={{ appearance: 'none', WebkitAppearance: 'none' }}>
+                <label htmlFor="discount-type">Type de remise</label>
+                <select id="discount-type" name="discountType" value={discountForm.discountType} onChange={handleDiscountInput} className="form-control" required style={{ appearance: 'none', WebkitAppearance: 'none' }}>
                   <option value="percentage">Pourcentage (%)</option>
                   <option value="fixed">Montant fixe (€)</option>
                 </select>
@@ -355,16 +367,16 @@ const AdminDashboard = () => {
                 </label>
               </div>
               <div className="form-group">
-                <label>Date de début (optionnelle)</label>
-                <input type="date" name="startDate" value={discountForm.startDate} onChange={handleDiscountInput} className="form-control" />
+                <label htmlFor="discount-start">Date de début (optionnelle)</label>
+                <input type="date" id="discount-start" name="startDate" value={discountForm.startDate} onChange={handleDiscountInput} className="form-control" />
               </div>
               <div className="form-group">
-                <label>Date de fin (optionnelle)</label>
-                <input type="date" name="endDate" value={discountForm.endDate} onChange={handleDiscountInput} className="form-control" />
+                <label htmlFor="discount-end">Date de fin (optionnelle)</label>
+                <input type="date" id="discount-end" name="endDate" value={discountForm.endDate} onChange={handleDiscountInput} className="form-control" />
               </div>
               <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-                <label>Description de l'offre</label>
-                <textarea name="description" value={discountForm.description} onChange={handleDiscountInput} className="form-control" placeholder="Décrivez les conditions de l'offre..." rows="3"></textarea>
+                <label htmlFor="discount-description">Description de l'offre</label>
+                <textarea id="discount-description" name="description" value={discountForm.description} onChange={handleDiscountInput} className="form-control" placeholder="Décrivez les conditions de l'offre..." rows="3"></textarea>
               </div>
             </div>
             <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
@@ -446,9 +458,6 @@ const AdminDashboard = () => {
           </div>
         </div>
       )}
-
     </div>
   );
-};
-
-export default AdminDashboard;
+}
