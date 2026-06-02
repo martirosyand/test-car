@@ -18,9 +18,20 @@ app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/gtauto')
-  .then(() => console.log('MongoDB connected'))
-  .catch(err => console.error('MongoDB connection error:', err));
+async function connectDB() {
+  while (true) {
+    try {
+      await mongoose.connect(process.env.MONGO_URI);
+      console.log("MongoDB connected");
+      break;
+    } catch (err) {
+      console.log("MongoDB not ready, retrying in 5s...");
+      await new Promise(resolve => setTimeout(resolve, 5000));
+    }
+  }
+}
+
+connectDB();
 
 // Register Routes
 app.use('/api/admin', adminRoutes);
