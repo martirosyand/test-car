@@ -98,3 +98,27 @@
 .car-specs-mini svg {
   color: var(--accent-color);
 }
+
+.car-status-badge {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  color: #fff;
+  padding: 0.4rem 1rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  z-index: 10;
+  letter-spacing: 0.5px;
+}
+
+.car-status-badge.sold {
+  background: #ff4757;
+  box-shadow: 0 4px 10px rgba(255, 71, 87, 0.4);
+}
+
+.car-status-badge.reserved {
+  background: #ffa502;
+  box-shadow: 0 4px 10px rgba(255, 165, 2, 0.4);
+}

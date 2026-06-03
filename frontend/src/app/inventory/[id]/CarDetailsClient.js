@@ -102,7 +102,11 @@ const CarDetailsClient = ({ car }) => {
         {/* Right Info */}
         <div className="car-info-full">
           <div className="header-info">
-            <span className="badge">{car.year}</span>
+            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.8rem', alignItems: 'center' }}>
+              <span className="badge">{car.year}</span>
+              {car.sold && <span className="badge" style={{ background: '#ff4757', color: '#fff', fontWeight: 700 }}>Vendu</span>}
+              {!car.sold && car.reserved && <span className="badge" style={{ background: '#ffa502', color: '#fff', fontWeight: 700 }}>Réservé</span>}
+            </div>
             <h1>{car.brand} {car.model}</h1>
             <h2 className="price">{car.price.toLocaleString('fr-FR')} €</h2>
           </div>

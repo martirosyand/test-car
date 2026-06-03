@@ -25,6 +25,8 @@ const CarCard = ({ car }) => {
           />
         )}
         <div className="car-badge">{car.year}</div>
+        {car.sold && <div className="car-status-badge sold">Vendu</div>}
+        {!car.sold && car.reserved && <div className="car-status-badge reserved">Réservé</div>}
         <div className="car-price">{car.price.toLocaleString('fr-FR')} €</div>
       </div>
       <div className="car-info">

@@ -14,11 +14,13 @@ export default function AdminDashboardClient() {
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState('cars'); // 'cars' or 'services' or 'discounts'
 
-  // Form State for new car
+  // Form State for car
   const [carForm, setCarForm] = useState({
-    title: '', brand: '', model: '', year: '', price: '', mileage: '', engine: '', transmission: '', description: ''
+    title: '', brand: '', model: '', year: '', price: '', mileage: '', engine: '', transmission: '', description: '',
+    reserved: false, sold: false
   });
   const [images, setImages] = useState(null);
+  const [editingCarId, setEditingCarId] = useState(null);
 
   // Form State for discounts
   const [discountForm, setDiscountForm] = useState({
@@ -69,31 +71,90 @@ export default function AdminDashboardClient() {
 
   const handleCarInput = (e) => setCarForm({ ...carForm, [e.target.name]: e.target.value });
 
+  const handleCarCheckbox = (e) => {
+    const { name, checked } = e.target;
+    setCarForm({ ...carForm, [name]: checked });
+  };
+
   const handleAddCar = async (e) => {
     e.preventDefault();
     const formData = new FormData();
-    for (let key in carForm) formData.append(key, carForm[key]);
-    if (images) {
+    for (let key in carForm) {
+      formData.append(key, carForm[key]);
+    }
+
+    if (editingCarId && (!images || images.length === 0)) {
+      const car = cars.find(c => c._id === editingCarId);
+      if (car && car.images) {
+        car.images.forEach(img => {
+          formData.append('existingImages', img);
+        });
+      }
+    } else if (images) {
       for (let i = 0; i < images.length; i++) {
         formData.append('images', images[i]);
       }
     }
 
     try {
-      await axios.post('/api/cars', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      if (editingCarId) {
+        await axios.put(`/api/cars/${editingCarId}`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        alert('Véhicule modifié avec succès');
+      } else {
+        await axios.post('/api/cars', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        alert('Véhicule ajouté avec succès');
+      }
+      
       // clear form
-      setCarForm({ title: '', brand: '', model: '', year: '', price: '', mileage: '', engine: '', transmission: '', description: '' });
+      setCarForm({
+        title: '', brand: '', model: '', year: '', price: '', mileage: '', engine: '', transmission: '', description: '',
+        reserved: false, sold: false
+      });
       setImages(null);
+      setEditingCarId(null);
       const fileInput = document.getElementById('image-input');
       if (fileInput) fileInput.value = "";
       fetchDashboardData();
-      alert('Véhicule ajouté avec succès');
     } catch (err) {
       console.error(err);
-      alert('Échec de l\'ajout du véhicule');
+      alert('Échec de l\'opération');
     }
+  };
+
+  const handleEditCar = (car) => {
+    setEditingCarId(car._id);
+    setCarForm({
+      title: car.title || '',
+      brand: car.brand || '',
+      model: car.model || '',
+      year: car.year || '',
+      price: car.price || '',
+      mileage: car.mileage || '',
+      engine: car.engine || '',
+      transmission: car.transmission || '',
+      description: car.description || '',
+      reserved: car.reserved || false,
+      sold: car.sold || false
+    });
+    const formElement = document.getElementById('car-form-element');
+    if (formElement) {
+      formElement.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const handleCancelEditCar = () => {
+    setCarForm({
+      title: '', brand: '', model: '', year: '', price: '', mileage: '', engine: '', transmission: '', description: '',
+      reserved: false, sold: false
+    });
+    setEditingCarId(null);
+    setImages(null);
+    const fileInput = document.getElementById('image-input');
+    if (fileInput) fileInput.value = "";
   };
 
   const handleDeleteCar = async (id) => {
@@ -222,7 +283,7 @@ export default function AdminDashboardClient() {
 
       {view === 'cars' && (
         <div className="dashboard-section">
-          <h2>Ajouter un Véhicule</h2>
+          <h2 id="car-form-element">{editingCarId ? 'Modifier le Véhicule' : 'Ajouter un Véhicule'}</h2>
           <form className="contact-form add-car-form" onSubmit={handleAddCar}>
             <div className="grid-form">
               <div className="form-group">
@@ -265,8 +326,23 @@ export default function AdminDashboardClient() {
                 <label htmlFor="image-input">Images (Sélection multiple)</label>
                 <input id="image-input" type="file" multiple accept="image/*" onChange={(e) => setImages(e.target.files)} className="form-control" style={{ padding: '0.8rem' }} />
               </div>
+              <div className="form-group" style={{ display: 'flex', alignItems: 'center', height: '100%', gap: '1.5rem', gridColumn: '1 / -1' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', cursor: 'pointer', margin: 0 }}>
+                  <input type="checkbox" name="reserved" checked={carForm.reserved} onChange={handleCarCheckbox} style={{ width: '20px', height: '20px', accentColor: 'var(--accent-color)' }} />
+                  <span>Réservé</span>
+                </label>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', cursor: 'pointer', margin: 0 }}>
+                  <input type="checkbox" name="sold" checked={carForm.sold} onChange={handleCarCheckbox} style={{ width: '20px', height: '20px', accentColor: 'var(--accent-color)' }} />
+                  <span>Vendu</span>
+                </label>
+              </div>
             </div>
-            <button type="submit" className="btn btn-primary mt-2">Ajouter le véhicule</button>
+            <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+              <button type="submit" className="btn btn-primary">{editingCarId ? 'Enregistrer les modifications' : 'Ajouter le véhicule'}</button>
+              {editingCarId && (
+                <button type="button" onClick={handleCancelEditCar} className="btn btn-outline">Annuler</button>
+              )}
+            </div>
           </form>
 
           <h2 style={{ marginTop: '3rem' }}>Inventaire Actuel</h2>
@@ -278,6 +354,7 @@ export default function AdminDashboardClient() {
                   <th>Modèle</th>
                   <th>Année</th>
                   <th>Prix</th>
+                  <th>Statut</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -289,11 +366,23 @@ export default function AdminDashboardClient() {
                     <td>{c.year}</td>
                     <td>{c.price.toLocaleString('fr-FR')} €</td>
                     <td>
-                      <button onClick={() => handleDeleteCar(c._id)} className="btn btn-danger" style={{ padding: '0.4rem 1rem', fontSize: '0.8rem' }}>Supprimer</button>
+                      {c.sold ? (
+                        <span className="status-badge" style={{ background: 'rgba(255, 71, 87, 0.2)', color: '#ff4757', border: '1px solid #ff4757' }}>Vendu</span>
+                      ) : c.reserved ? (
+                        <span className="status-badge" style={{ background: 'rgba(255, 165, 2, 0.2)', color: '#ffa502', border: '1px solid #ffa502' }}>Réservé</span>
+                      ) : (
+                        <span className="status-badge" style={{ background: 'rgba(46, 204, 113, 0.2)', color: '#2ecc71', border: '1px solid #2ecc71' }}>Disponible</span>
+                      )}
+                    </td>
+                    <td>
+                      <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <button onClick={() => handleEditCar(c)} className="btn btn-outline" style={{ padding: '0.4rem 1rem', fontSize: '0.8rem' }}>Modifier</button>
+                        <button onClick={() => handleDeleteCar(c._id)} className="btn btn-danger" style={{ padding: '0.4rem 1rem', fontSize: '0.8rem' }}>Supprimer</button>
+                      </div>
                     </td>
                   </tr>
                 ))}
-                {cars.length === 0 && <tr><td colSpan="5" style={{ textAlign: 'center' }}>Aucun véhicule trouvé.</td></tr>}
+                {cars.length === 0 && <tr><td colSpan="6" style={{ textAlign: 'center' }}>Aucun véhicule trouvé.</td></tr>}
               </tbody>
             </table>
           </div>
