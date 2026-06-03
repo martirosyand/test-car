@@ -19,6 +19,9 @@ export const metadata = {
   alternates: {
     canonical: '/',
   },
+  verification: {
+    google: 're9Hy3HFrMLepqj-kV1oceIbYFQ0oHN0C7Fv_iwhrok',
+  },
   openGraph: {
     title: "GT Auto | Garage de Confiance",
     description: "Garage de confiance pour l'entretien, la réparation et la vente automobile premium.",
