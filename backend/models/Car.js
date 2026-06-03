@@ -11,6 +11,8 @@ const CarSchema = new mongoose.Schema({
   transmission: { type: String, required: true },
   description: { type: String },
   images: [{ type: String }],
+  reserved: { type: Boolean, default: false },
+  sold: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now }
 });
 
