@@ -60,7 +60,7 @@ export default function ContactPage() {
 
       <div className="map-container">
         <iframe
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d845.1599620750247!2d3.2247034118518387!3d45.72870555340456!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47f6e31e3f50389d%3A0x772d86363b3380ab!2zMyBSdGUgZHUgUG9udCwgNjM4MDAgUMOpcmlnbmF0LXN1ci1BbGxpZXIsINCk0YDQsNC90YbQuNGP!5e0!3m2!1sfr!2fr!4v1780341437158!5m2!1sfr!2fr&hl=fr"
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2785.100720589846!2d3.2224066770177506!3d45.72907487107956!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47f6e3730ec72da7%3A0x59ca2044db0d7f2!2sGARAGE%20GT%20AUTO!5e0!3m2!1sfr!2sfr!4v1780477955299!5m2!1sfr!2sfr"
           width="100%"
           height="100%"
           style={{ border: 0 }}
