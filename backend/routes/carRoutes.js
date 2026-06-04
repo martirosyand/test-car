@@ -6,18 +6,41 @@ const { v4: uuidv4 } = require('uuid');
 const Car = require('../models/Car');
 const authMiddleware = require('../middleware/authMiddleware');
 
-// Configure local multer storage
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'uploads/');
-  },
+const sharp = require('sharp');
+const fs = require('fs');
 
-  filename: function (req, file, cb) {
-    cb(null, `${uuidv4()}${path.extname(file.originalname)}`);
+// Configure memory storage for Multer
+const storage = multer.memoryStorage();
+const upload = multer({
+  storage,
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10MB limit per file
   }
 });
 
-const upload = multer({ storage });
+// Helper function to process image buffers: convert to WebP, resize, compress
+const processUploadedImages = async (files) => {
+  const filePaths = [];
+  if (!files || files.length === 0) return filePaths;
+
+  for (const file of files) {
+    const filename = `${uuidv4()}.webp`;
+    const filepath = path.join(__dirname, '..', 'uploads', filename);
+
+    await sharp(file.buffer)
+      .resize({
+        width: 1920,
+        height: 1920,
+        fit: 'inside',
+        withoutEnlargement: true
+      })
+      .webp({ quality: 80 })
+      .toFile(filepath);
+
+    filePaths.push(`/uploads/${filename}`);
+  }
+  return filePaths;
+};
 
 // Wrapper middleware to intercept Multer errors and log diagnostics
 const handleUpload = (req, res, next) => {
@@ -81,7 +104,7 @@ router.get('/:id', async (req, res) => {
 // Create a new car (Protected)
 router.post('/', authMiddleware, handleUpload, async (req, res) => {
   try {
-    const newFiles = req.files ? req.files.map(file => `/uploads/${file.filename}`) : [];
+    const newFiles = await processUploadedImages(req.files);
     let images = [];
     
     if (req.body.imageOrder) {
@@ -115,7 +138,7 @@ router.post('/', authMiddleware, handleUpload, async (req, res) => {
 router.put('/:id', authMiddleware, handleUpload, async (req, res) => {
   try {
     let updateData = { ...req.body };
-    const newFiles = req.files ? req.files.map(file => `/uploads/${file.filename}`) : [];
+    const newFiles = await processUploadedImages(req.files);
     
     if (req.body.imageOrder) {
       const order = JSON.parse(req.body.imageOrder);

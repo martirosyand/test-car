@@ -2,6 +2,7 @@
 
 import React, { useState, useRef } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Engine, Speedometer, GasPump, Calendar, CaretLeft, CaretRight } from '@phosphor-icons/react';
 
 const CarDetailsClient = ({ car }) => {
@@ -63,8 +64,18 @@ const CarDetailsClient = ({ car }) => {
             <div className="main-image-carousel" ref={carouselRef} onScroll={handleScroll}>
               {car.images && car.images.length > 0 ? (
                 car.images.map((img, idx) => (
-                  <div className="carousel-slide" key={idx}>
-                    <img src={img} alt={`${car.brand} ${car.model} - Vue ${idx + 1}`} />
+                  <div className="carousel-slide" key={idx} style={{ position: 'relative' }}>
+                    <Image
+                      src={img}
+                      alt={`${car.brand} ${car.model} - Vue ${idx + 1}`}
+                      fill
+                      sizes="(max-width: 900px) 100vw, 800px"
+                      style={{ objectFit: 'cover' }}
+                      priority={idx === 0}
+                      loading={idx === 0 ? undefined : 'lazy'}
+                      placeholder="blur"
+                      blurDataURL="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MDAiIGhlaWdodD0iNTAwIiB2aWV3Qm94PSIwIDAgODAwIDUwMCI+PHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI1MDAiIGZpbGw9IiMxYTFhMWYiLz48L3N2Zz4="
+                    />
                   </div>
                 ))
               ) : (
@@ -88,13 +99,20 @@ const CarDetailsClient = ({ car }) => {
           {car.images && car.images.length > 1 && (
             <div className="thumbnails">
               {car.images.map((img, idx) => (
-                <img
+                <div
                   key={idx}
-                  src={img}
-                  alt={`Thumbnail ${idx}`}
-                  className={activeImage === img ? 'active' : ''}
+                  className={`thumbnail-wrapper ${activeImage === img ? 'active' : ''}`}
                   onClick={() => scrollToImage(idx)}
-                />
+                >
+                  <Image
+                    src={img}
+                    alt={`Thumbnail ${idx}`}
+                    fill
+                    sizes="120px"
+                    style={{ objectFit: 'cover' }}
+                    loading="lazy"
+                  />
+                </div>
               ))}
             </div>
           )}

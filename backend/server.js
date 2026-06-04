@@ -44,7 +44,10 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 app.use(csrfMiddleware);
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'), {
+  maxAge: '365d',
+  immutable: true
+}));
 
 // Connect to MongoDB
 async function connectDB() {
