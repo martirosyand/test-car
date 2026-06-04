@@ -181,6 +181,12 @@
   .mobile-description {
     display: none;
   }
+
+  .car-info-full {
+    position: sticky;
+    top: 140px;
+    align-self: start;
+  }
 }
 
 
