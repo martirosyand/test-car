@@ -4,25 +4,30 @@ import Image from 'next/image';
 import { Engine, Speedometer, GasPump } from '@phosphor-icons/react/dist/ssr';
 
 const CarCard = ({ car }) => {
-  const defaultImage = "https://via.placeholder.com/400x250?text=No+Image";
-  const imageSrc = car.images && car.images.length > 0
-    ? car.images[0]
-    : defaultImage;
+  const hasImages = car.images && car.images.length > 0;
+  const imageSrc = hasImages ? car.images[0] : '';
 
   return (
     <Link href={`/inventory/${car._id}`} className="car-card">
       <div className="car-image">
-        {imageSrc.startsWith('http') ? (
-          <img src={imageSrc} alt={`${car.year} ${car.brand} ${car.model}`} />
+        {hasImages ? (
+          imageSrc.startsWith('http') ? (
+            <img src={imageSrc} alt={`${car.year} ${car.brand} ${car.model}`} />
+          ) : (
+            <Image 
+              src={imageSrc} 
+              alt={`${car.year} ${car.brand} ${car.model}`}
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              style={{ objectFit: 'cover' }}
+              priority={false}
+            />
+          )
         ) : (
-          <Image 
-            src={imageSrc} 
-            alt={`${car.year} ${car.brand} ${car.model}`}
-            fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            style={{ objectFit: 'cover' }}
-            priority={false}
-          />
+          <div className="placeholder-no-image">
+            <span>GT AUTO</span>
+            <small>Aucune photo disponible</small>
+          </div>
         )}
         <div className="car-badge">{car.year}</div>
         {car.sold && <div className="car-status-badge sold">Vendu</div>}

@@ -101,3 +101,110 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Image Management styles */
+.image-management-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 1.5rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px dashed var(--metallic-border);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-top: 0.5rem;
+}
+
+.image-management-card {
+  position: relative;
+  background: var(--bg-card);
+  border: 1px solid var(--metallic-border);
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  transition: transform var(--transition), border-color var(--transition);
+}
+
+.image-management-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent-color);
+}
+
+.image-management-card .image-container {
+  position: relative;
+  width: 100%;
+  padding-top: 66.67%; /* 3:2 Aspect Ratio */
+  background: #000;
+}
+
+.image-management-card .image-container img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.badge-new-upload {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  background: var(--accent-color);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  z-index: 2;
+}
+
+.image-management-card .image-actions {
+  display: flex;
+  justify-content: space-around;
+  background: rgba(0, 0, 0, 0.5);
+  border-top: 1px solid var(--metallic-border);
+  padding: 0.5rem;
+}
+
+.btn-icon {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0.3rem;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition);
+}
+
+.btn-icon:hover:not(:disabled) {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.btn-icon:disabled {
+  opacity: 0.2;
+  cursor: not-allowed;
+}
+
+.btn-icon.btn-danger-icon:hover {
+  color: #ff4757;
+  background: rgba(255, 71, 87, 0.1);
+}
+
+.no-images-placeholder {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px dashed var(--metallic-border);
+  border-radius: 8px;
+  padding: 2.5rem;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}

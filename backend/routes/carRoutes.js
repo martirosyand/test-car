@@ -48,14 +48,31 @@ router.get('/:id', async (req, res) => {
 });
 
 // Create a new car (Protected)
-router.post('/', authMiddleware, upload.array('images', 5), async (req, res) => {
+router.post('/', authMiddleware, upload.array('images', 10), async (req, res) => {
   try {
-    const imagePaths = req.files ? req.files.map(file => `/uploads/${file.filename}`) : [];
+    const newFiles = req.files ? req.files.map(file => `/uploads/${file.filename}`) : [];
+    let images = [];
+    
+    if (req.body.imageOrder) {
+      const order = JSON.parse(req.body.imageOrder);
+      images = order.map(item => {
+        if (item.startsWith('existing:')) {
+          return item.slice('existing:'.length);
+        } else if (item.startsWith('new:')) {
+          const index = parseInt(item.slice('new:'.length), 10);
+          return newFiles[index];
+        }
+        return null;
+      }).filter(Boolean);
+    } else {
+      images = newFiles;
+    }
+
     const newCar = new Car({
       ...req.body,
-      images: imagePaths
+      images: images
     });
-    console.log(imagePaths)
+    console.log(images);
     const savedCar = await newCar.save();
     res.status(201).json(savedCar);
   } catch (err) {
@@ -64,15 +81,29 @@ router.post('/', authMiddleware, upload.array('images', 5), async (req, res) => 
 });
 
 // Update car (Protected)
-router.put('/:id', authMiddleware, upload.array('images', 5), async (req, res) => {
+router.put('/:id', authMiddleware, upload.array('images', 10), async (req, res) => {
   try {
     let updateData = { ...req.body };
-    console.log(updateData)
-    if (req.files && req.files.length > 0) {
-      updateData.images = req.files.map(file => `/uploads/${file.filename}`);
-    } else if (req.body.existingImages) {
-      // Allow passing array of existing images if none uploaded
-      updateData.images = Array.isArray(req.body.existingImages) ? req.body.existingImages : [req.body.existingImages];
+    const newFiles = req.files ? req.files.map(file => `/uploads/${file.filename}`) : [];
+    
+    if (req.body.imageOrder) {
+      const order = JSON.parse(req.body.imageOrder);
+      updateData.images = order.map(item => {
+        if (item.startsWith('existing:')) {
+          return item.slice('existing:'.length);
+        } else if (item.startsWith('new:')) {
+          const index = parseInt(item.slice('new:'.length), 10);
+          return newFiles[index];
+        }
+        return null;
+      }).filter(Boolean);
+    } else {
+      // Fallback for old behavior
+      if (req.files && req.files.length > 0) {
+        updateData.images = newFiles;
+      } else if (req.body.existingImages) {
+        updateData.images = Array.isArray(req.body.existingImages) ? req.body.existingImages : [req.body.existingImages];
+      }
     }
 
     const updatedCar = await Car.findByIdAndUpdate(req.params.id, updateData, { new: true });

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
+import { Trash, ArrowLeft, ArrowRight, Upload } from '@phosphor-icons/react';
 
 // Ensure cookie-based sessions work by enabling credentials on all requests
 axios.defaults.withCredentials = true;
@@ -19,8 +20,45 @@ export default function AdminDashboardClient() {
     title: '', brand: '', model: '', year: '', price: '', mileage: '', engine: '', transmission: '', description: '',
     reserved: false, sold: false
   });
-  const [images, setImages] = useState(null);
+  const [imagesList, setImagesList] = useState([]);
   const [editingCarId, setEditingCarId] = useState(null);
+
+  const handleImageChange = (e) => {
+    if (e.target.files) {
+      const files = Array.from(e.target.files);
+      const newImages = files.map((file, idx) => ({
+        id: `new-${Date.now()}-${idx}-${Math.random().toString(36).substr(2, 9)}`,
+        type: 'new',
+        file: file,
+        url: URL.createObjectURL(file)
+      }));
+      setImagesList(prev => [...prev, ...newImages]);
+    }
+    e.target.value = '';
+  };
+
+  const handleDeleteImage = (indexToSelect) => {
+    setImagesList(prev => {
+      const updated = [...prev];
+      const removed = updated.splice(indexToSelect, 1)[0];
+      if (removed && removed.type === 'new' && removed.url.startsWith('blob:')) {
+        URL.revokeObjectURL(removed.url);
+      }
+      return updated;
+    });
+  };
+
+  const handleMoveImage = (index, direction) => {
+    if (direction === 'left' && index === 0) return;
+    if (direction === 'right' && index === imagesList.length - 1) return;
+    const targetIndex = direction === 'left' ? index - 1 : index + 1;
+    setImagesList(prev => {
+      const updated = [...prev];
+      const [moved] = updated.splice(index, 1);
+      updated.splice(targetIndex, 0, moved);
+      return updated;
+    });
+  };
 
   // Form State for discounts
   const [discountForm, setDiscountForm] = useState({
@@ -83,18 +121,18 @@ export default function AdminDashboardClient() {
       formData.append(key, carForm[key]);
     }
 
-    if (editingCarId && (!images || images.length === 0)) {
-      const car = cars.find(c => c._id === editingCarId);
-      if (car && car.images) {
-        car.images.forEach(img => {
-          formData.append('existingImages', img);
-        });
+    const order = [];
+    let fileIndex = 0;
+    imagesList.forEach((img) => {
+      if (img.type === 'existing') {
+        order.push(`existing:${img.url}`);
+      } else if (img.type === 'new' && img.file) {
+        formData.append('images', img.file);
+        order.push(`new:${fileIndex}`);
+        fileIndex++;
       }
-    } else if (images) {
-      for (let i = 0; i < images.length; i++) {
-        formData.append('images', images[i]);
-      }
-    }
+    });
+    formData.append('imageOrder', JSON.stringify(order));
 
     try {
       if (editingCarId) {
@@ -114,7 +152,12 @@ export default function AdminDashboardClient() {
         title: '', brand: '', model: '', year: '', price: '', mileage: '', engine: '', transmission: '', description: '',
         reserved: false, sold: false
       });
-      setImages(null);
+      imagesList.forEach(img => {
+        if (img.type === 'new' && img.url.startsWith('blob:')) {
+          URL.revokeObjectURL(img.url);
+        }
+      });
+      setImagesList([]);
       setEditingCarId(null);
       const fileInput = document.getElementById('image-input');
       if (fileInput) fileInput.value = "";
@@ -140,6 +183,15 @@ export default function AdminDashboardClient() {
       reserved: car.reserved || false,
       sold: car.sold || false
     });
+    setImagesList(
+      car.images
+        ? car.images.map((img, idx) => ({
+            id: `existing-${idx}-${img}`,
+            type: 'existing',
+            url: img
+          }))
+        : []
+    );
     const formElement = document.getElementById('car-form-element');
     if (formElement) {
       formElement.scrollIntoView({ behavior: 'smooth' });
@@ -152,7 +204,12 @@ export default function AdminDashboardClient() {
       reserved: false, sold: false
     });
     setEditingCarId(null);
-    setImages(null);
+    imagesList.forEach(img => {
+      if (img.type === 'new' && img.url.startsWith('blob:')) {
+        URL.revokeObjectURL(img.url);
+      }
+    });
+    setImagesList([]);
     const fileInput = document.getElementById('image-input');
     if (fileInput) fileInput.value = "";
   };
@@ -323,8 +380,66 @@ export default function AdminDashboardClient() {
                 <textarea id="car-description" name="description" value={carForm.description} onChange={handleCarInput} className="form-control" rows="4"></textarea>
               </div>
               <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-                <label htmlFor="image-input">Images (Sélection multiple)</label>
-                <input id="image-input" type="file" multiple accept="image/*" onChange={(e) => setImages(e.target.files)} className="form-control" style={{ padding: '0.8rem' }} />
+                <label>Gestion des images (Ordre d'affichage)</label>
+                {imagesList.length > 0 ? (
+                  <div className="image-management-grid">
+                    {imagesList.map((img, idx) => (
+                      <div key={img.id} className="image-management-card">
+                        <div className="image-container">
+                          <img src={img.url} alt={`Aperçu ${idx + 1}`} />
+                          {img.type === 'new' && (
+                            <span className="badge-new-upload">Nouveau</span>
+                          )}
+                        </div>
+                        <div className="image-actions">
+                          <button
+                            type="button"
+                            className="btn-icon"
+                            onClick={() => handleMoveImage(idx, 'left')}
+                            disabled={idx === 0}
+                            title="Déplacer vers la gauche"
+                          >
+                            <ArrowLeft size={16} />
+                          </button>
+                          <button
+                            type="button"
+                            className="btn-icon"
+                            onClick={() => handleMoveImage(idx, 'right')}
+                            disabled={idx === imagesList.length - 1}
+                            title="Déplacer vers la droite"
+                          >
+                            <ArrowRight size={16} />
+                          </button>
+                          <button
+                            type="button"
+                            className="btn-icon btn-danger-icon"
+                            onClick={() => handleDeleteImage(idx)}
+                            title="Supprimer cette image"
+                          >
+                            <Trash size={16} />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="no-images-placeholder">
+                    Aucune image sélectionnée. Ce véhicule n'aura pas d'image affichée.
+                  </div>
+                )}
+                <div style={{ marginTop: '1rem' }}>
+                  <label htmlFor="image-input" className="btn btn-outline" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                    <Upload size={18} /> Choisir des images
+                  </label>
+                  <input
+                    id="image-input"
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    style={{ display: 'none' }}
+                  />
+                </div>
               </div>
               <div className="form-group" style={{ display: 'flex', alignItems: 'center', height: '100%', gap: '1.5rem', gridColumn: '1 / -1' }}>
                 <label style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', cursor: 'pointer', margin: 0 }}>

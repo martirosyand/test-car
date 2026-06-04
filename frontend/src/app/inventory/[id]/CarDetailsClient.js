@@ -10,8 +10,6 @@ const CarDetailsClient = ({ car }) => {
   );
   const carouselRef = useRef(null);
 
-  const defaultImg = "https://via.placeholder.com/800x500?text=No+Image+Available";
-
   const handleScroll = () => {
     if (carouselRef.current && car && car.images) {
       const scrollPosition = carouselRef.current.scrollLeft;
@@ -71,7 +69,10 @@ const CarDetailsClient = ({ car }) => {
                 ))
               ) : (
                 <div className="carousel-slide">
-                  <img src={defaultImg} alt={car.title} />
+                  <div className="placeholder-no-image">
+                    <span>GT AUTO</span>
+                    <small>Aucune photo disponible</small>
+                  </div>
                 </div>
               )}
             </div>
