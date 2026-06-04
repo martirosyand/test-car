@@ -4,7 +4,6 @@ import Image from 'next/image';
 import CarCard from '@/components/CarCard';
 import { Drop, Engine, SteeringWheel } from '@phosphor-icons/react/dist/ssr';
 
-// Configure backend URL for SSR data fetching
 const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:5000';
 
 async function getFeaturedCars() {
@@ -30,16 +29,17 @@ async function getDiscounts() {
   }
 }
 
+// Optimized Metadata inheriting absolute paths safely from layout's metadataBase
 export const metadata = {
-  title: "GT Auto | Vente et Entretien de Véhicules Premium",
+  title: "Vente et Entretien de Véhicules Premium",
   description: "Découvrez notre sélection de véhicules d'occasion révisés et garantis, ainsi que nos prestations d'entretien mécanique et diagnostic de pointe.",
   alternates: {
-    canonical: '/',
+    canonical: '', 
   },
   openGraph: {
     title: "GT Auto | Vente et Entretien de Véhicules Premium",
     description: "Découvrez notre sélection de véhicules d'occasion révisés et garantis, ainsi que nos prestations d'entretien mécanique et diagnostic de pointe.",
-    url: '/',
+    url: '',
   },
 };
 
@@ -49,23 +49,22 @@ export default async function Home() {
     getDiscounts()
   ]);
 
-  // Schema.org structured data for local business / garage
+  // Schema.org optimization: Local business targeting aligned to French formatting rules
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'AutoRepair',
     'name': 'GT Auto',
-    'image': 'http://localhost:3000/logo.png',
+    'image': `${process.env.NEXT_PUBLIC_SITE_URL || 'https://votre-domaine.com'}/og-image.jpg`,
     'address': {
       '@type': 'PostalAddress',
-      'streetAddress': '123 Performance Blvd.',
-      'addressLocality': 'Motor City',
-      'addressRegion': 'CA',
-      'postalCode': '90210',
-      'addressCountry': 'US'
+      'streetAddress': '3 BIS ROUTE DU PONT',
+      'addressLocality': 'Pérignat-sur-Allier',
+      'postalCode': '63800',
+      'addressCountry': 'FR'
     },
-    'telephone': '+1 (555) 123-4567',
+    'telephone': '+33 6 68 68 51 68',
     'openingHours': 'Mo-Fr 08:00-18:00, Sa 09:00-14:00',
-    'priceRange': '$$'
+    'priceRange': '€€€'
   };
 
   return (
@@ -77,16 +76,25 @@ export default async function Home() {
 
       <section id="home" className="hero-split">
         <div className="hero-left-panel container">
-          <img src="/logo.png" alt="Garage GT Auto Logo" className="hero-logo-img" />
+          {/* OPTIMIZED: Native Next.js Image component to protect Core Web Vitals (CLS/LCP) */}
+          <div className="hero-logo-wrapper" style={{ position: 'relative', width: '200px', height: '80px' }}>
+            <Image 
+              src="/logo.png" 
+              alt="Garage GT Auto Logo" 
+              fill
+              style={{ objectFit: 'contain' }}
+              priority 
+            />
+          </div>
           <h2 className="hero-subheadline">GARAGE DE CONFIANCE POUR L'ENTRETIEN, LA RÉPARATION ET LA VENTE AUTOMOBILE</h2>
         </div>
-        <div className="hero-right-panel">
+        <div className="hero-right-panel" style={{ position: 'relative' }}>
           <Image 
             src="/hero-bg.jpg" 
             alt="Premium Garage Car" 
             className="hero-car-image" 
             fill
-            sizes="50vw"
+            sizes="(max-width: 768px) 100vw, 50vw"
             style={{ objectFit: 'cover' }}
             priority
           />
