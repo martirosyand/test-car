@@ -163,7 +163,7 @@ const CarDetailsClient = ({ car }) => {
 
           <div className="description">
             <h3>DESCRIPTION DU VÉHICULE</h3>
-            <p>{car.description || "Aucune description fournie."}</p>
+            <p style={{ whiteSpace: 'pre-wrap' }}>{car.description || "Aucune description fournie."}</p>
           </div>
 
           <div className="action-box">
