@@ -116,6 +116,12 @@ const CarDetailsClient = ({ car }) => {
               ))}
             </div>
           )}
+
+          {/* Description for Tablet/Desktop (hidden on mobile) */}
+          <div className="description desktop-description">
+            <h3>DESCRIPTION DU VÉHICULE</h3>
+            <p style={{ whiteSpace: 'pre-wrap' }}>{car.description || "Aucune description fournie."}</p>
+          </div>
         </div>
 
         {/* Right Info */}
@@ -161,7 +167,8 @@ const CarDetailsClient = ({ car }) => {
             </div>
           </div>
 
-          <div className="description">
+          {/* Description for Mobile (hidden on desktop) */}
+          <div className="description mobile-description">
             <h3>DESCRIPTION DU VÉHICULE</h3>
             <p style={{ whiteSpace: 'pre-wrap' }}>{car.description || "Aucune description fournie."}</p>
           </div>

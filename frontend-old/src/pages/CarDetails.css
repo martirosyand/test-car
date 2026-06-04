@@ -78,6 +78,7 @@
 }
 
 .car-info-full {
+  height: fit-content;
   display: flex;
   flex-direction: column;
   gap: 2rem;

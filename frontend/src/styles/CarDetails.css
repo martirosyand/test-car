@@ -79,6 +79,7 @@
 }
 
 .car-info-full {
+  height: fit-content;
   display: flex;
   flex-direction: column;
   gap: 2rem;
@@ -157,6 +158,31 @@
   word-wrap: break-word;
   overflow-wrap: break-word;
 }
+
+/* Responsive display and layout rules for the description */
+.desktop-description {
+  display: none;
+}
+
+.mobile-description {
+  display: block;
+}
+
+@media (min-width: 901px) {
+  .desktop-description {
+    display: block;
+    margin-top: 2rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--metallic-border);
+    border-radius: 12px;
+    padding: 2rem;
+  }
+
+  .mobile-description {
+    display: none;
+  }
+}
+
 
 .action-box {
   background: var(--bg-secondary);
