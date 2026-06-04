@@ -8,6 +8,56 @@ import { Trash, ArrowLeft, ArrowRight, Upload } from '@phosphor-icons/react';
 // Ensure cookie-based sessions work by enabling credentials on all requests
 axios.defaults.withCredentials = true;
 
+const compressImage = (file) => {
+  return new Promise((resolve, reject) => {
+    if (!file.type.startsWith('image/')) {
+      return resolve(file);
+    }
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target.result;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+        const maxDim = 1920;
+        if (width > maxDim || height > maxDim) {
+          if (width > height) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        canvas.toBlob(
+          (blob) => {
+            if (blob) {
+              const compressedFile = new File([blob], file.name, {
+                type: file.type,
+                lastModified: Date.now()
+              });
+              resolve(compressedFile);
+            } else {
+              reject(new Error("La compression de l'image a échoué."));
+            }
+          },
+          file.type || 'image/jpeg',
+          0.8
+        );
+      };
+      img.onerror = () => reject(new Error("Impossible de décoder l'image."));
+    };
+    reader.onerror = () => reject(new Error("Impossible de lire le fichier."));
+  });
+};
+
 export default function AdminDashboardClient() {
   const [cars, setCars] = useState([]);
   const [services, setServices] = useState([]);
@@ -22,10 +72,17 @@ export default function AdminDashboardClient() {
   });
   const [imagesList, setImagesList] = useState([]);
   const [editingCarId, setEditingCarId] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleImageChange = (e) => {
     if (e.target.files) {
       const files = Array.from(e.target.files);
+      const totalCount = imagesList.length + files.length;
+      if (totalCount > 20) {
+        alert("Maximum 20 images autorisées.");
+        e.target.value = '';
+        return;
+      }
       const newImages = files.map((file, idx) => ({
         id: `new-${Date.now()}-${idx}-${Math.random().toString(36).substr(2, 9)}`,
         type: 'new',
@@ -116,25 +173,40 @@ export default function AdminDashboardClient() {
 
   const handleAddCar = async (e) => {
     e.preventDefault();
-    const formData = new FormData();
-    for (let key in carForm) {
-      formData.append(key, carForm[key]);
+    if (imagesList.length > 20) {
+      alert("Maximum 20 images autorisées.");
+      return;
     }
-
-    const order = [];
-    let fileIndex = 0;
-    imagesList.forEach((img) => {
-      if (img.type === 'existing') {
-        order.push(`existing:${img.url}`);
-      } else if (img.type === 'new' && img.file) {
-        formData.append('images', img.file);
-        order.push(`new:${fileIndex}`);
-        fileIndex++;
-      }
-    });
-    formData.append('imageOrder', JSON.stringify(order));
+    if (isSaving) return; // Prevent duplicate submissions
+    setIsSaving(true);
 
     try {
+      const formData = new FormData();
+      for (let key in carForm) {
+        formData.append(key, carForm[key]);
+      }
+
+      const order = [];
+      let fileIndex = 0;
+
+      // Compress new images before uploading
+      for (const img of imagesList) {
+        if (img.type === 'existing') {
+          order.push(`existing:${img.url}`);
+        } else if (img.type === 'new' && img.file) {
+          try {
+            const compressed = await compressImage(img.file);
+            formData.append('images', compressed, img.file.name);
+            order.push(`new:${fileIndex}`);
+            fileIndex++;
+          } catch (compressErr) {
+            console.error(compressErr);
+            throw new Error(`Erreur lors de la compression de "${img.file.name}" : ${compressErr.message}`);
+          }
+        }
+      }
+      formData.append('imageOrder', JSON.stringify(order));
+
       if (editingCarId) {
         await axios.put(`/api/cars/${editingCarId}`, formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
@@ -164,7 +236,9 @@ export default function AdminDashboardClient() {
       fetchDashboardData();
     } catch (err) {
       console.error(err);
-      alert('Échec de l\'opération');
+      alert(err.message || 'Échec de l\'opération');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -339,7 +413,15 @@ export default function AdminDashboardClient() {
       </div>
 
       {view === 'cars' && (
-        <div className="dashboard-section">
+        <div className="dashboard-section" style={{ position: 'relative' }}>
+          {isSaving && (
+            <div className="loading-overlay">
+              <div className="spinner-container">
+                <div className="spinner"></div>
+                <p className="loading-text">Enregistrement en cours...</p>
+              </div>
+            </div>
+          )}
           <h2 id="car-form-element">{editingCarId ? 'Modifier le Véhicule' : 'Ajouter un Véhicule'}</h2>
           <form className="contact-form add-car-form" onSubmit={handleAddCar}>
             <div className="grid-form">
@@ -453,9 +535,11 @@ export default function AdminDashboardClient() {
               </div>
             </div>
             <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-              <button type="submit" className="btn btn-primary">{editingCarId ? 'Enregistrer les modifications' : 'Ajouter le véhicule'}</button>
+              <button type="submit" className="btn btn-primary" disabled={isSaving}>
+                {isSaving ? 'Enregistrement...' : (editingCarId ? 'Enregistrer les modifications' : 'Ajouter le véhicule')}
+              </button>
               {editingCarId && (
-                <button type="button" onClick={handleCancelEditCar} className="btn btn-outline">Annuler</button>
+                <button type="button" onClick={handleCancelEditCar} className="btn btn-outline" disabled={isSaving}>Annuler</button>
               )}
             </div>
           </form>

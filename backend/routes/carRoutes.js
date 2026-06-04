@@ -19,6 +19,37 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
+// Wrapper middleware to intercept Multer errors and log diagnostics
+const handleUpload = (req, res, next) => {
+  upload.array('images', 20)(req, res, (err) => {
+    if (err) {
+      console.error("=== MULTER UPLOAD ERROR ===");
+      console.error("Message:", err.message);
+      console.error("Field name:", err.field);
+      console.error("Request body keys:", Object.keys(req.body || {}));
+      if (req.files) {
+        console.error("Uploaded file field names:", req.files.map(f => f.fieldname));
+      } else if (req.file) {
+        console.error("Uploaded file field name:", req.file.fieldname);
+      }
+      console.error("===========================");
+
+      if (err instanceof multer.MulterError) {
+        return res.status(400).json({
+          success: false,
+          message: err.message,
+          field: err.field || 'images'
+        });
+      }
+      return res.status(400).json({
+        success: false,
+        message: err.message || "File upload failed"
+      });
+    }
+    next();
+  });
+};
+
 // Get all cars
 router.get('/', async (req, res) => {
   try {
@@ -48,7 +79,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // Create a new car (Protected)
-router.post('/', authMiddleware, upload.array('images', 10), async (req, res) => {
+router.post('/', authMiddleware, handleUpload, async (req, res) => {
   try {
     const newFiles = req.files ? req.files.map(file => `/uploads/${file.filename}`) : [];
     let images = [];
@@ -81,7 +112,7 @@ router.post('/', authMiddleware, upload.array('images', 10), async (req, res) =>
 });
 
 // Update car (Protected)
-router.put('/:id', authMiddleware, upload.array('images', 10), async (req, res) => {
+router.put('/:id', authMiddleware, handleUpload, async (req, res) => {
   try {
     let updateData = { ...req.body };
     const newFiles = req.files ? req.files.map(file => `/uploads/${file.filename}`) : [];
