@@ -123,6 +123,7 @@ export default function AdminDashboardClient() {
     description: '',
     discountValue: '',
     discountType: 'percentage',
+    couponCode: '',
     startDate: '',
     endDate: '',
     isActive: true
@@ -339,7 +340,7 @@ export default function AdminDashboardClient() {
       }
       
       setDiscountForm({
-        title: '', description: '', discountValue: '', discountType: 'percentage', startDate: '', endDate: '', isActive: true
+        title: '', description: '', discountValue: '', discountType: 'percentage', couponCode: '', startDate: '', endDate: '', isActive: true
       });
       setEditingDiscountId(null);
       fetchDashboardData();
@@ -362,6 +363,7 @@ export default function AdminDashboardClient() {
       description: discount.description || '',
       discountValue: discount.discountValue || '',
       discountType: discount.discountType || 'percentage',
+      couponCode: discount.couponCode || '',
       startDate: formatInputDate(discount.startDate),
       endDate: formatInputDate(discount.endDate),
       isActive: discount.isActive !== undefined ? discount.isActive : true
@@ -375,7 +377,7 @@ export default function AdminDashboardClient() {
 
   const handleCancelEdit = () => {
     setDiscountForm({
-      title: '', description: '', discountValue: '', discountType: 'percentage', startDate: '', endDate: '', isActive: true
+      title: '', description: '', discountValue: '', discountType: 'percentage', couponCode: '', startDate: '', endDate: '', isActive: true
     });
     setEditingDiscountId(null);
   };
@@ -648,6 +650,10 @@ export default function AdminDashboardClient() {
                   <option value="fixed">Montant fixe (€)</option>
                 </select>
               </div>
+              <div className="form-group">
+                <label htmlFor="discount-coupon-code">Code coupon (optionnel)</label>
+                <input type="text" id="discount-coupon-code" name="couponCode" value={discountForm.couponCode} onChange={handleDiscountInput} className="form-control" placeholder="Ex: SUMMERDIS" />
+              </div>
               <div className="form-group" style={{ display: 'flex', alignItems: 'center', height: '100%', paddingTop: '1.8rem' }}>
                 <label style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', cursor: 'pointer', margin: 0 }}>
                   <input type="checkbox" name="isActive" checked={discountForm.isActive} onChange={handleDiscountCheckbox} style={{ width: '20px', height: '20px', accentColor: 'var(--accent-color)' }} />
@@ -712,7 +718,14 @@ export default function AdminDashboardClient() {
 
                   return (
                     <tr key={d._id}>
-                      <td style={{ fontWeight: '600' }}>{d.title}</td>
+                      <td style={{ fontWeight: '600' }}>
+                        {d.title}
+                        {d.couponCode && (
+                          <div style={{ fontSize: '0.8rem', color: 'var(--accent-color)', marginTop: '0.2rem', fontWeight: '500' }}>
+                            Code : {d.couponCode}
+                          </div>
+                        )}
+                      </td>
                       <td>
                         {d.discountType === 'percentage' ? `${d.discountValue}%` : `${d.discountValue.toLocaleString('fr-FR')} €`}
                       </td>

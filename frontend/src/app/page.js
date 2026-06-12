@@ -158,20 +158,38 @@ export default async function Home() {
                       gap: '0.5rem',
                       borderTop: '1px solid var(--metallic-border)',
                       paddingTop: '1rem',
-                      fontWeight: '600'
+                      fontWeight: '600',
+                      justifyContent: 'space-between'
                     }}>
-                      <span>🕒</span>
-                      <span>
-                        {discount.startDate && discount.endDate ? (
-                          `Du ${new Date(discount.startDate).toLocaleDateString('fr-FR')} au ${new Date(discount.endDate).toLocaleDateString('fr-FR')}`
-                        ) : discount.startDate ? (
-                          `À partir du ${new Date(discount.startDate).toLocaleDateString('fr-FR')}`
-                        ) : discount.endDate ? (
-                          `Jusqu'au ${new Date(discount.endDate).toLocaleDateString('fr-FR')}`
-                        ) : (
-                          "Offre permanente"
+                      <div>
+<                       span>🕒</span>
+                        <span>
+                          {discount.startDate && discount.endDate ? (
+                            `Du ${new Date(discount.startDate).toLocaleDateString('fr-FR')} au ${new Date(discount.endDate).toLocaleDateString('fr-FR')}`
+                          ) : discount.startDate ? (
+                            `À partir du ${new Date(discount.startDate).toLocaleDateString('fr-FR')}`
+                          ) : discount.endDate ? (
+                            `Jusqu'au ${new Date(discount.endDate).toLocaleDateString('fr-FR')}`
+                          ) : (
+                            "Offre permanente"
+                          )}
+                        </span>
+                      </div>
+                      {discount.couponCode && (
+                          <div style={{
+                            display: 'inline-block',
+                            backgroundColor: 'rgba(230, 0, 0, 0.05)',
+                            border: '1px dashed var(--accent-color)',
+                            color: 'var(--accent-color)',
+                            padding: '0.4rem 0.8rem',
+                            borderRadius: '4px',
+                            fontSize: '0.9rem',
+                            fontWeight: '600',
+                            letterSpacing: '0.5px'
+                          }}>
+                            Code promo : <strong style={{ letterSpacing: '1px' }}>{discount.couponCode}</strong>
+                          </div>
                         )}
-                      </span>
                     </div>
                   </div>
                 );
